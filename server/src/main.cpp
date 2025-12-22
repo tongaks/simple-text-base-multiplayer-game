@@ -4,7 +4,10 @@ int main(int argc, char const *argv[]) {
 	Socket socket1;
 	// socket1.SetupSocket();
 	
+	bool stillChoice = true;
 	while (1) {
+		if (!stillChoice) continue;
+
 		int choice;
 
 		std::cout << "\n\n1. Start the server\n" << "2. Exit\n"; 
@@ -13,11 +16,13 @@ int main(int argc, char const *argv[]) {
 		std::cin >> choice;
 
 		if (choice == 1) {
-			if (!socket1.isStarted) socket1.SetupSocket();
-			else {
+			if (!socket1.isStarted) {
+				socket1.SetupSocket();
+				stillChoice = false;
+			} else {
 				std::cout << "[!] Server is already running.\n";
 				continue;
-			} 
+			}
 
 		} else if (choice == 2) break;
 	};
