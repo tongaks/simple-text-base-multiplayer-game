@@ -1,19 +1,23 @@
 #include "../headers/game.h"
 
-Character::Character(std::string n, int h, int dmg) {
-	this->name = n;
-	this->health = h;
-	this->damage = dmg;
+void Game::PrintMainMenu() {
+	std::cout << "1. Start the game\n" << "2. Exit\n";
+	std::cout << "> ";
+
+	int choice = 0;
+	std::cin >> choice;
+
+	if (choice == 1) {
+		StartGame();
+	} else if (choice == 2) {
+		exit(1);
+	}
 }
 
-void Character::SetHealth(int dmg) {
-	this->health -= dmg;
-}
+void Game::StartGame() {
+	PrintDialoge();
 
-int Character::GetHealthStatus() {
-	return this->health;
-}
-
-int Character::GetDamageStatus() {
-	return this->damage;
+	while (true) {
+		
+	}
 }

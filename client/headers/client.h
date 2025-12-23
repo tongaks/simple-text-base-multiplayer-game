@@ -11,9 +11,11 @@ class Socket {
 
 public:
 	~Socket() { close(clientSocket); }
+	
+	bool isConnected = false;	
 
 	void SetupSocket();
 	void ConnectToTheServer();
 	void ListenToServer();
-	void SendToServer();
+	void SendToServer(std::string msg);
 };

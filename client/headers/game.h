@@ -1,15 +1,10 @@
-#include "includes.h"
 
-class Character {
-
-	std::string name;
-	int health;
-	int damage;
-
+class Game {
 public:
-	Character(std::string n, int h, int dmg);
+	void PrintMainMenu();
 
-	void SetHealth(int dmg); // handler for when a character gets damaged
-	int GetHealthStatus(); // return current health points
-	int GetDamageStatus(); // return current character damage
+	void StartGame();
+	void PrintDialoge();
+	void PrintSelectMovement();
+	void GetMovement();
 };

@@ -75,7 +75,7 @@ void Socket::HandleClientConnection(int clientSocket, std::string clientIP) {
 
 		if (receivedBytes < 0) {
 			std::cerr << "[!] Server: Failed to read data sent by IP: " << clientIP << " err code:  " << receivedBytes << "\n";
-			exit(1);
+			// exit(1);
 			break;
 		}
 
