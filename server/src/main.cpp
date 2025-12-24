@@ -1,6 +1,6 @@
 #include "../headers/socket.h"
 
-int main(int argc, char const *argv[]) {
+int main() {
 	Socket socket1;
 	// socket1.SetupSocket();
 	
