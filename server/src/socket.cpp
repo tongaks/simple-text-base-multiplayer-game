@@ -67,7 +67,7 @@ void Socket::HandleIncomingClients() {
 
 
 void Socket::HandleClientConnection(int clientSocket, std::string clientIP) {
-	send(clientSocket, "ping", 4, 0);
+	// send(clientSocket, "ping", 4, 0);
 
 	while (true) {
 		char buffer[100];
