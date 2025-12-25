@@ -1,8 +1,4 @@
-#include "../headers/game.h"
-
-// sent client info to server
-// then server create its own object 
-// base on the client sent info 
+#include "../headers/character.h"
 
 Character::Character(std::string n, int h, int dmg) {
 	this->name = n;

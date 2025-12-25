@@ -1,10 +1,17 @@
+#include "includes.h"
+#include "client.h"
 
-class Game {
+class Game : public Socket {
+
+	int playerX;
+	int playerY;
+
 public:
-	void PrintMainMenu();
+	void Start();
 
-	void StartGame();
-	void PrintDialoge();
-	void PrintSelectMovement();
-	void GetMovement();
+	bool CreateServerSideInstance(std::string name); 
+
+	void PrintMap(int width, int height, int posX, int posY);
+	bool HandleBorder(int width, int height, int posX, int posY, int plane, int dir);
+	// int PrintMovementSelection(int posX, int posY);
 };

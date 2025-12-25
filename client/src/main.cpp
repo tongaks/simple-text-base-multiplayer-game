@@ -1,19 +1,27 @@
-#include "../headers/client.h"
+// #include "../headers/client.h"
+#include "../headers/character.h"
+#include "../headers/game.h"
 
-int main(int argc, char const *argv[]) {
-	Socket sock1;
-	sock1.SetupSocket();
+int main() {
+
+	Game game1;
+	game1.SetupSocket();
 
 	std::string name;
 	std::cout << "Enter your name: ";
 	std::getline(std::cin, name);
 
-	// sock1.SendToServer(name);
 
-	while (1) {
-		if (!sock1.isConnected) sock1.ConnectToTheServer();
-		sock1.ListenToServer();
-	}
+	initscr();
+
+	Character player(name, 100, 10);
+
+	if (!game1.isConnected) game1.ConnectToTheServer();
+
+	if (game1.CreateServerSideInstance(name)) {
+		std::cout << "[+] Instance created. Continueing.\n";
+		game1.Start();
+	} else std::cerr << "[!] Failed to create instance. Exiting.\n";
 
 	return 0;
 }

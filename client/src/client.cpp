@@ -24,24 +24,24 @@ void Socket::ConnectToTheServer() {
         exit(1);
     }
 
-    std::cout << "Connected to server on port 3423\n";
+    std::cout << "[+] Connected to the server on port 3423\n";
     isConnected = true;
 }
+
 
 void Socket::SendToServer(std::string msg) {
     const char* info = msg.c_str();
     send(clientSocket, info, strlen(info), 0);
 }
 
-void Socket::ListenToServer() {
+
+std::string Socket::ListenToServer() {
 	char buffer[BUFFER_SIZE];
     std::string msg(buffer);
 
     ssize_t bytes = recv(clientSocket, buffer, BUFFER_SIZE - 1, 0);
     if (bytes > 0) {
         buffer[bytes] = '\0';
-        std::cout << "Server: " << buffer << std::endl;
-    }
-
-    if (msg == "ping") this->SendToServer("pong");
+        return std::string(buffer);
+    } else return "err";
 }

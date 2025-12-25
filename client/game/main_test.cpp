@@ -1,6 +1,9 @@
-#include "../headers/game.h"
+#include <iostream>
+#include <vector>
+#include <ncurses.h>
 
-void Game::PrintMap(int width, int height, int playerX, int playerY) {
+
+void PrintMap(int width, int height, int playerX, int playerY) {
     erase();
 
     for (int y = 0; y < height; y++) {
@@ -19,7 +22,16 @@ void Game::PrintMap(int width, int height, int playerX, int playerY) {
     refresh();
 }
 
-bool Game::HandleBorder(int width, int height, int posX, int posY, int plane, int dir) {
+// int PrintMovementSelection(int posX, int posY) {
+// 	std::cout << "1. Move right\t2. Move left\t3. Move up\t4. Move down\n";
+// 	printf("(%i, %i)> ", posX, posY);
+
+// 	int choice = 0;
+// 	std::cin >> choice;
+// 	return choice;
+// }
+
+bool HandleBorder(int width, int height, int posX, int posY, int plane, int dir) {
 	// plane = 1 -> x plane
 	// plane = 2 -> x plane
 
@@ -47,7 +59,8 @@ bool Game::HandleBorder(int width, int height, int posX, int posY, int plane, in
 	return true; // allow movement
 }
 
-void Game::Start() {
+int main(int argc, char const *argv[]) {
+	// std::vector<std::vector<int>> map;
 	initscr();
 
 	int width = 30; 
@@ -90,4 +103,6 @@ void Game::Start() {
 	    PrintMap(width, height, playerX, playerY);
 	    refresh();
 	}
+
+	return 0;
 }

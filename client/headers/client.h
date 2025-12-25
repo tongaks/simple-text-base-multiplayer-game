@@ -16,6 +16,6 @@ public:
 
 	void SetupSocket();
 	void ConnectToTheServer();
-	void ListenToServer();
+	std::string ListenToServer();
 	void SendToServer(std::string msg);
 };
