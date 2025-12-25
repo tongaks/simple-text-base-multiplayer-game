@@ -1,26 +1,25 @@
 #include <iostream>
 #include <vector>
+#include <ncurses.h>
+
 
 void PrintMap(int width, int height, int playerX, int playerY) {
-	for (int i = 0; i < width; i++) {
-		std::cout << "#";
-	} std::cout << '\n';
+    erase();
 
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            if (y == 0 || y == height - 1 || x == 0 || x == width - 1) {
+                mvaddch(y, x, '#');
+            } 
 
-	for (int d = 0; d < height; d++) {
-		for (int i = 0; i < width; i++) {
-			if (i == 0) std::cout << "#";
-			else if (i == width-1) std::cout << "#";
-			// print player position
-			else if (i == playerX + 1 && d == playerY) std::cout << "P";
-			else std::cout << " ";
-		} std::cout << '\n';
-	}
+            else if (x == playerX + 1 && y == playerY + 1) {
+                mvaddch(y, x, 'P');
+            }
+        }
+    }
 
-
-	for (int i = 0; i < width; i++) {
-		std::cout << "#";
-	} std::cout << "\n\n";
+    printw("\n\n[x: %i] [y: %i]", playerX, playerY);
+    refresh();
 }
 
 int PrintMovementSelection(int posX, int posY) {
@@ -52,7 +51,8 @@ bool HandleBorder(int width, int height, int posX, int posY, int plane, int dir)
 		if (dir == 1) {
 			if (posY - 1 <= -1) return false; // handle up
 		} else if (dir == 2) {
-			if (posY + 1 >= height) return false; // handle down
+			// 3 = 2 walls (top bottom) + the 'P'
+			if (posY + 1 > height-3) return false; // handle down
 		}
 	}
 
@@ -61,37 +61,47 @@ bool HandleBorder(int width, int height, int posX, int posY, int plane, int dir)
 
 int main(int argc, char const *argv[]) {
 	// std::vector<std::vector<int>> map;
+	initscr();
 
-	int width = 40; 
-	int height = 20;
+	int width = 30; 
+	int height = 10;
 	int playerX = 2;
 	int playerY = 2;
 
 	PrintMap(width, height, playerX, playerY);
+	refresh();
 
-	while (1) {
-		switch (PrintMovementSelection(playerX, playerY)) {
-		case 1: // right
-			if (HandleBorder(width, height, playerX, playerY, 1, 2)) {
-				playerX += 1;
-			} break;
-		case 2: // left
-			if (HandleBorder(width, height, playerX, playerY, 1, 1)) {
-				playerX -= 1;
-			} break;
-		case 3:
-			if (HandleBorder(width, height, playerX, playerY, 2, 1)) {
-				playerY -= 1;
-			} break;
-		case 4:
-			if (HandleBorder(width, height, playerX, playerY, 2, 2)) {
-				playerY += 1;
-			} break;
-		default:
-			break;
-		}
+	int ch;
+	while((ch = getch()) != 'q') { 
 
-		PrintMap(width, height, playerX, playerY);
+	    switch (ch) {
+	        case 'w': case 'W': case KEY_UP:
+	            if (HandleBorder(width, height, playerX, playerY, 2, 1)) {
+	                playerY -= 1;
+	            } break;
+
+	        case 's': case 'S': case KEY_DOWN:
+	            if (HandleBorder(width, height, playerX, playerY, 2, 2)) {
+	                playerY += 1;
+	            } break;
+
+	        case 'a': case 'A': case KEY_LEFT:
+	            if (HandleBorder(width, height, playerX, playerY, 1, 1)) {
+	                playerX -= 1;
+	            } break;
+
+	        case 'd': case 'D': case KEY_RIGHT:
+	            if (HandleBorder(width, height, playerX, playerY, 1, 2)) {
+	                playerX += 1;
+	            } break;
+
+	        default:
+	            break;
+	    }
+
+		// system("clear");
+	    PrintMap(width, height, playerX, playerY);
+	    refresh();
 	}
 
 	return 0;
