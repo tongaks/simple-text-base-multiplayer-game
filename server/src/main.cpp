@@ -2,7 +2,6 @@
 
 int main() {
 	Socket socket1;
-	// socket1.SetupSocket();
 	
 	bool stillChoice = true;
 	while (1) {

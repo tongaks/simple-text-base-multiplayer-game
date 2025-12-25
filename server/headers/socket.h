@@ -19,6 +19,7 @@ class Socket {
 
 public:
 	bool isStarted = false;
+	std::vector<int> serverSockets;
 
 	// deconstructor
 	~Socket() { close(serverSocket); }

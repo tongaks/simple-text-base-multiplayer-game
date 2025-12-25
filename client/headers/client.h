@@ -18,4 +18,6 @@ public:
 	void ConnectToTheServer();
 	std::string ListenToServer();
 	void SendToServer(std::string msg);
+
+	void GetServerList();
 };

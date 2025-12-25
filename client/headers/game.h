@@ -26,5 +26,7 @@ public:
 
 	void PrintMap(int width, int height, MapInfo map);
 	bool HandleBorder(int width, int height, int posX, int posY, int plane, int dir);
+
+	void GetServerList();
 	// int PrintMovementSelection(int posX, int posY);
 };

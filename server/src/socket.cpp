@@ -1,11 +1,13 @@
 #include "../headers/socket.h"
 #include "../headers/game.h"
 
+// to do: set up multiple sockets
+
 void Socket::SetupSocket() {
 	serverSocket = socket(AF_INET, SOCK_STREAM, 0);
     
     serverInfo.sin_family = AF_INET;
-    serverInfo.sin_port = htons(serverPort);
+    serverInfo.sin_port = htons(serverSocket);
     serverInfo.sin_addr.s_addr = htonl(INADDR_ANY);
 
     int opt = 1;
@@ -21,8 +23,7 @@ void Socket::SetupSocket() {
         return;
     }
 
-    Notice("Done setting up the server socket. Handling incoming connections.");
-
+    Notice("Done setting up the server socket [" + std::to_string(serverSocket) + "]. Handling incoming connections.");
     isStarted = true;
 
     std::thread([this]() {
@@ -92,6 +93,8 @@ void Socket::HandleClientConnection(int clientSocket, std::string clientIP) {
 				int mapPosStrLength = mapPos.length();
 				send(clientSocket, mapPos.c_str(), mapPosStrLength, 0);
 				Notice("Instance accepted.");
+			} else if (message.find("servers")) {
+				// return list of server sockets
 			}
         }
 
