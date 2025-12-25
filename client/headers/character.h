@@ -6,10 +6,9 @@ class Character {
 	int damage;
 
 public:
-	Character(std::string n, int h, int dmg);
+	std::string player_name;
 
-	std::string name;
-
+	void SetCharacterInfo(std::string n, int h, int dmg);
 	void SetHealth(int dmg); // handler for when a character gets damaged
 	int GetHealthStatus(); // return current health points
 	int GetDamageStatus(); // return current character damage

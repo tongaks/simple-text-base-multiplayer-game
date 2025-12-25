@@ -15,7 +15,7 @@ build/character.o: src/character.cpp headers/character.h headers/includes.h
 	@mkdir -p build
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
-build/game.o: src/game.cpp headers/client.h headers/includes.h headers/game.h
+build/game.o: src/game.cpp headers/client.h headers/includes.h headers/game.h headers/character.h
 	@mkdir -p build
 	$(CXX) $(CXXFLAGS) -c $< -o $@ -lncurses
 

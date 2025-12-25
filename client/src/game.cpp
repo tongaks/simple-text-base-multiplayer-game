@@ -86,33 +86,42 @@ void Game::Start() {
 
 	int ch;
 	while((ch = getch()) != 'q') { 
+		bool allowed = false;
 
 	    switch (ch) {
 	        case 'w': case 'W': case KEY_UP:
 	            if (HandleBorder(width, height, playerX, playerY, 2, 1)) {
 	                playerY -= 1;
+	                allowed = true;
 	            } break;
 
 	        case 's': case 'S': case KEY_DOWN:
 	            if (HandleBorder(width, height, playerX, playerY, 2, 2)) {
 	                playerY += 1;
+	                allowed = true;
 	            } break;
 
 	        case 'a': case 'A': case KEY_LEFT:
 	            if (HandleBorder(width, height, playerX, playerY, 1, 1)) {
 	                playerX -= 1;
+	                allowed = true;
 	            } break;
 
 	        case 'd': case 'D': case KEY_RIGHT:
 	            if (HandleBorder(width, height, playerX, playerY, 1, 2)) {
 	                playerX += 1;
+	                allowed = true;
 	            } break;
 
 	        default:
 	            break;
 	    }
 
-		// system("clear");
+	    if (allowed) {
+		    std::string data = this->player_name + ":" + std::to_string(playerX) + "," + std::to_string(playerY);
+		    SendToServer(data);
+	    }
+
 	    PrintMap(width, height, playerX, playerY);
 	    refresh();
 	}

@@ -1,5 +1,5 @@
 // #include "../headers/client.h"
-#include "../headers/character.h"
+// #include "../headers/character.h"
 #include "../headers/game.h"
 
 int main() {
@@ -14,9 +14,10 @@ int main() {
 
 	initscr();
 
-	Character player(name, 100, 10);
+	// Character player(name, 100, 10);
 
 	if (!game1.isConnected) game1.ConnectToTheServer();
+	game1.SetCharacterInfo(name, 100, 10);
 
 	if (game1.CreateServerSideInstance(name)) {
 		std::cout << "[+] Instance created. Continueing.\n";

@@ -1,7 +1,8 @@
 #include "includes.h"
 #include "client.h"
+#include "character.h"
 
-class Game : public Socket {
+class Game : public Socket, public Character {
 
 	int playerX;
 	int playerY;

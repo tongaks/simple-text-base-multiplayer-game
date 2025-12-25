@@ -72,7 +72,6 @@ void Socket::HandleClientConnection(int clientSocket, std::string clientIP) {
 	while (true) {
 		char buffer[100];
 		int receivedBytes = recv(clientSocket, buffer, sizeof(buffer), 0);
-		std::string message(buffer);
 
 		if (receivedBytes < 0) {
 			std::cerr << "[!] Server: Failed to read data sent by IP: " << clientIP << " err code:  " << receivedBytes << "\n";
@@ -80,11 +79,14 @@ void Socket::HandleClientConnection(int clientSocket, std::string clientIP) {
 			break;
 		}
 
-        if (receivedBytes > 0 && strcmp(buffer, "pong") == 0) {
-            send(clientSocket, "ping", 4, 0);
-        } else if (receivedBytes > 0) {
+		if (receivedBytes > 0) {
+
+			buffer[receivedBytes] = '\0';
+			std::string message(buffer);
+
         	std::cout << "From client: " << buffer << '\n';
 
+        	// instance request
 			if (message.find("username") != std::string::npos) {
 	            send(clientSocket, "ok", 2, 0);
 	            std::cout << "Instance request accepted.\n";

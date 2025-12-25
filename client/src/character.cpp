@@ -1,7 +1,7 @@
 #include "../headers/character.h"
 
-Character::Character(std::string n, int h, int dmg) {
-	this->name = n;
+void Character::SetCharacterInfo(std::string n, int h, int dmg) {
+	this->player_name = n;
 	this->health = h;
 	this->damage = dmg;
 }
