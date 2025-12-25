@@ -5,18 +5,27 @@ bool Game::CreateServerSideInstance(std::string name) {
 	if (this->isConnected) {
 		SendToServer("username:" + name);
 
-		printw("[+] Instance requested. Waiting for confirmation.");
+		printw("[+] Instance requested. Waiting for confirmation.\n");
 		refresh();
 
 		int attempts = 0;
 		while (attempts < 10) {
 
 			std::string msg = ListenToServer();
-			if (msg == "ok") break;
+			if (msg.find("map")) {
+				printw("%s\n", msg.c_str());
+				refresh();
+
+				rawMapData = msg;
+				break;
+			}
 
 	        attempts++;
 	        std::this_thread::sleep_for(std::chrono::seconds(3));
-		} return true;
+		} 
+
+		erase();
+		return true;
 
 	} else {
 		printw("[!] Not connected to the server.");
@@ -26,20 +35,45 @@ bool Game::CreateServerSideInstance(std::string name) {
 	}
 }
 
-void Game::PrintMap(int width, int height, int playerX, int playerY) {
+Game::MapInfo Game::ParseMap(std::string mapInfo) {
+	std::stringstream ss(mapInfo);
+	std::string buffer;
+
+	MapInfo processedMap;
+
+	int count = 0;
+	while (ss >> buffer) {
+		printw("%s\n", buffer.c_str());
+		refresh();
+
+		if (count == 0) processedMap.playerPosX = std::stoi(buffer);
+		if (count == 1) processedMap.playerPosY = std::stoi(buffer);
+		if (count == 2) processedMap.exitPosX = std::stoi(buffer);
+		if (count == 3) processedMap.exitPosY = std::stoi(buffer);
+
+		// getch();
+		count++;
+	}
+
+	return processedMap;
+}
+
+void Game::PrintMap(int width, int height, MapInfo map) {
     refresh();
     erase();
     refresh();
 
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
+
             if (y == 0 || y == height - 1 || x == 0 || x == width - 1) {
                 mvaddch(y, x, '#');
-            } 
-
-            else if (x == playerX + 1 && y == playerY + 1) {
+            } else if (x == map.playerPosX + 1 && y == map.playerPosY + 1) {
                 mvaddch(y, x, 'P');
+            } else if (x == map.exitPosX + 1 && y == map.exitPosY + 1) {
+                mvaddch(y, x, 'E');
             }
+
         }
     }
 
@@ -78,10 +112,16 @@ bool Game::HandleBorder(int width, int height, int posX, int posY, int plane, in
 void Game::Start() {
 	int width = 30; 
 	int height = 10;
-	int playerX = 2;
-	int playerY = 2;
 
-	PrintMap(width, height, playerX, playerY);
+	bool exitFound = false;
+
+	MapInfo mapInfo = ParseMap(rawMapData);
+	int& playerX = mapInfo.playerPosX;
+	int& playerY = mapInfo.playerPosY;
+	int& exitX = mapInfo.exitPosX;
+	int& exitY = mapInfo.exitPosY;
+
+	PrintMap(width, height, mapInfo);
 	refresh();
 
 	int ch;
@@ -112,6 +152,12 @@ void Game::Start() {
 	                playerX += 1;
 	                allowed = true;
 	            } break;
+	
+	        case 'e': case 'E': // player pressed e in the exit
+	        	if (playerX == exitX && playerY == exitY) {
+	        		SendToServer("Player: " + this->player_name + " win");
+	        		exitFound = true;
+	        	} break;
 
 	        default:
 	            break;
@@ -120,9 +166,9 @@ void Game::Start() {
 	    if (allowed) {
 		    std::string data = this->player_name + ":" + std::to_string(playerX) + "," + std::to_string(playerY);
 		    SendToServer(data);
-	    }
+	    } else if (exitFound) exit(1);
 
-	    PrintMap(width, height, playerX, playerY);
+	    PrintMap(width, height, mapInfo);
 	    refresh();
 	}
 }

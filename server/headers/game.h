@@ -1,6 +1,7 @@
 #include "includes.h"
 
 class Game {
+
 public:
-	void PrintMainMenu();
+	bool GenerateMap(int width, int height, int pX, int pY);
 };

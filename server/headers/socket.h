@@ -2,6 +2,9 @@
 
 class Socket {
 
+	const int MAPW = 30;
+	const int MAPH = 10;
+
 	// server
 	int serverSocket = 0;
 	int serverPort = 3423;
@@ -24,6 +27,8 @@ public:
 
 	void HandleIncomingClients();
 	void HandleClientConnection(int clientSocket, std::string clientIP);
+
+	std::string GenerateMap(int width, int height);
 
 	void Notice(std::string msg);
 	void Warning(std::string msg);

@@ -6,6 +6,7 @@
 #include <thread>
 #include <mutex>
 #include <unistd.h>
+#include <random>
 
 // socket lib
 #include <arpa/inet.h>

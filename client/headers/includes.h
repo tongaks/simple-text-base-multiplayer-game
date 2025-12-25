@@ -2,6 +2,7 @@
 #include <iostream>
 #include <cstring>
 #include <vector>
+#include <sstream>
 
 // socket
 #include <unistd.h>
