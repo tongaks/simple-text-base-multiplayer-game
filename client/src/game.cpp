@@ -109,39 +109,39 @@ bool Game::HandleBorder(int width, int height, int posX, int posY, int plane, in
 	return true; // allow movement
 }
 
-void Game::GetServerList() {
-	// request server list (sockets?)
-	SendToServer("servers");
+// void Game::GetServerList() {
+// 	// request server list (sockets?)
+// 	SendToServer("servers");
 
-	std::vector<std::string> serverList;
-	while (1) {
-		std::string reply = ListenToServer();
-		if (reply.find("sockets")) {
-			std::string buffer 
-			std::stringstream ss(reply);
+// 	std::vector<std::string> serverList;
+// 	while (1) {
+// 		std::string reply = ListenToServer();
+// 		if (reply.find("sockets")) {
+// 			std::string buffer 
+// 			std::stringstream ss(reply);
 
-			while (ss >> buffer) {
-				serverList.push_back(buffer);
-			} break;
-		}
-	}
+// 			while (ss >> buffer) {
+// 				serverList.push_back(buffer);
+// 			} break;
+// 		}
+// 	}
 
-	int currentSelected = 0;
+// 	int currentSelected = 0;
 
-    erase();
-    printw("========== Server list ==========\n\n");
+//     erase();
+//     printw("========== Server list ==========\n\n");
 
-    // loop through server list
-    int count = 0;
-    for (std::string server : serverList) {
-    	printw("%i. %s\n", count+1, server);
-    	refresh();
-    	count++;
-    }
+//     // loop through server list
+//     int count = 0;
+//     for (std::string server : serverList) {
+//     	printw("%i. %s\n", count+1, server);
+//     	refresh();
+//     	count++;
+//     }
 
-    printw("========== Server list ==========");
-    refresh();
-}
+//     printw("========== Server list ==========");
+//     refresh();
+// }
 
 void Game::Start() {
 	int width = 30; 

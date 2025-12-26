@@ -16,7 +16,7 @@ int main() {
 
 		if (choice == 1) {
 			if (!socket1.isStarted) {
-				socket1.SetupSocket();
+				socket1.CreateSockets(5);
 				stillChoice = false;
 			} else {
 				std::cout << "[!] Server is already running.\n";

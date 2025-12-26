@@ -18,16 +18,30 @@ class Socket {
 	std::mutex clientMutexHandler;
 
 public:
-	bool isStarted = false;
-	std::vector<int> serverSockets;
+	// std::vector<int> serverSockets;
+	// std::vector<sockaddr_in> serverSocketsInfo;
+	// std::vector<int> serverPorts;
 
+	struct ServerSocket {
+		int socket = 0;
+		int port;
+		struct sockaddr_in serverInfo; 
+	};
+
+	bool isStarted = false;
+	std::vector<ServerSocket> serverSockets;
+	std::vector<std::unique_ptr<ServerSocket>> uServerSockets;
+
+
+	// functions
 	// deconstructor
 	~Socket() { close(serverSocket); }
 
-	void SetupSocket();
+	void CreateSockets(int count);
+	void SetupSocket(ServerSocket &ss);
 
-	void HandleIncomingClients();
-	void HandleClientConnection(int clientSocket, std::string clientIP);
+	void HandleIncomingClients(ServerSocket &ss);
+	void HandleClientConnection(std::string port, int clientSocket, std::string clientIP);
 
 	std::string GenerateMap(int width, int height);
 

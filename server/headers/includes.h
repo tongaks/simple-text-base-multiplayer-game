@@ -7,6 +7,7 @@
 #include <mutex>
 #include <unistd.h>
 #include <random>
+#include <memory> // for unique_ptr
 
 // socket lib
 #include <arpa/inet.h>

@@ -4,13 +4,17 @@
 
 int main() {
 
-	Game game1;
-	game1.SetupSocket();
+	int port;
+	std::cout << "Enter server port: ";
+	std::cin >> port;
 
 	std::string name;
 	std::cout << "Enter your name: ";
 	std::getline(std::cin, name);
 
+	Game game1;
+	game1.SERVER_PORT = port;
+	game1.SetupSocket();
 
 	initscr();
 
