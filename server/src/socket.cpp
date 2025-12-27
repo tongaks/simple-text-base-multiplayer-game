@@ -8,11 +8,9 @@ void Socket::CreateSockets(int count) {
 	// generate random port
 	srand(time(0));
 	for (int i = 0; i < count; i++) {
-		ServerSocket st;
-		st.port = std::rand() % (9999 + 1 - 4000) + 4000;
-
-		Notice("Port: " + std::to_string(st.port) + " created.");
-		uServerSockets.emplace_back(std::make_unique<ServerSocket>(st));
+		int port = std::rand() % (9999 + 1 - 4000) + 4000;
+		Notice("Port: " + std::to_string(port) + " created.");
+		uServerSockets.emplace_back(std::make_unique<ServerSocket>(port));
 	}
 
 	// set up after pushing the ServerSocket
@@ -59,29 +57,26 @@ void Socket::HandleIncomingClients(ServerSocket &ss) {
 		socklen_t clientLen = sizeof(clientInfo);
 
 		int clientSocket = accept(ss.socket, (struct sockaddr*) &clientInfo, &clientLen);
-        if (clientSocket < 0) {
-            continue;
-        }
+        if (clientSocket < 0) continue;
 
 		char clientIPBuffer[INET_ADDRSTRLEN]; // buffer for storing client IP addr
 		inet_ntop(AF_INET, &clientInfo.sin_addr, clientIPBuffer, INET_ADDRSTRLEN);
 		std::string clientIP(clientIPBuffer);
 
 		{
-			std::lock_guard<std::mutex> lock(clientMutexHandler);
+			std::lock_guard<std::mutex> lock(ss.clientMutex);
 
-			clientConnectedCount += 1;
-			clientsConnected.push_back(clientIP);
-			clientsSocket.push_back(clientSocket);
+			ss.clientCount += 1;
+			ss.clientsIP.push_back(clientIP);
+			ss.clientsSocket.push_back(clientSocket);
 
-			// PROBLEM: 
-			// for some reason, client can't connect to the
-			// 1st created port
-
-			std::thread ([this, port = std::to_string(ss.port), 
+			std::thread ([
+					this, 
+					port = std::to_string(ss.port), 
 			        socket = clientSocket, 
-			        ip = clientIP]() {
-			    HandleClientConnection(port, socket, ip);
+			        ip = clientIP,
+			        &ss]() {
+			    HandleClientConnection(ss, port, socket, ip);
 			}).detach();
 
 
@@ -92,8 +87,7 @@ void Socket::HandleIncomingClients(ServerSocket &ss) {
 }
 
 
-void Socket::HandleClientConnection(std::string port, int clientSocket, std::string clientIP) {
-	// send(clientSocket, "ping", 4, 0);
+void Socket::HandleClientConnection(ServerSocket &ss, std::string port, int clientSocket, std::string clientIP) {
 
 	while (true) {
 		char buffer[100];
@@ -101,7 +95,6 @@ void Socket::HandleClientConnection(std::string port, int clientSocket, std::str
 
 		if (receivedBytes < 0) {
 			std::cerr << "[!] Server port [" << port << "]: Failed to read data sent by IP: " << clientIP << " err code:  " << receivedBytes << "\n";
-			// exit(1);
 			break;
 		}
 
@@ -110,8 +103,6 @@ void Socket::HandleClientConnection(std::string port, int clientSocket, std::str
 			buffer[receivedBytes] = '\0';
 			std::string message(buffer);
 			Notice("[" + port + "] client: " + buffer);
-        	// std::cout << "From client: " << buffer << '\n';
-
 
         	// instance request
 			if (message.find("username") != std::string::npos) {
@@ -129,10 +120,9 @@ void Socket::HandleClientConnection(std::string port, int clientSocket, std::str
 
 
 	{
-	    clientMutexHandler.lock();
-	    clientConnectedCount--;
-	    clientsSocket.erase(clientsSocket.begin() + clientSocket);
-	    clientMutexHandler.unlock();
+	    std::lock_guard<std::mutex> lock(ss.clientMutex);
+	    ss.clientCount--;
+	    ss.clientsSocket.erase(ss.clientsSocket.begin() + clientSocket);
 	    Warning("[" + port +"] client [ " + clientIP + " ]: disconnected.");
     }
     
@@ -157,6 +147,8 @@ std::string Socket::GenerateMap(int width, int height) {
 
 	return playerPos + " " + exitPos;
 }
+
+
 
 
 void Socket::Notice(std::string msg) {
