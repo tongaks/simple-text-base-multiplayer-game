@@ -1,6 +1,6 @@
 #include "../headers/client.h"
 
-void Socket::SetupSocket() {
+void Socket::SetupSocket(int port) {
     clientSocket = socket(AF_INET, SOCK_STREAM, 0);
     if (clientSocket < 0) {
         perror("socket");
@@ -8,7 +8,7 @@ void Socket::SetupSocket() {
     }
 
     serverInfo.sin_family = AF_INET;
-    serverInfo.sin_port = htons(SERVER_PORT);
+    serverInfo.sin_port = htons(port);
 
     if (inet_pton(AF_INET, "127.0.0.1", &serverInfo.sin_addr) <= 0) {
         perror("inet_pton");
@@ -19,12 +19,14 @@ void Socket::SetupSocket() {
 
 void Socket::ConnectToTheServer() {
     if (connect(clientSocket, (struct sockaddr*)&serverInfo, sizeof(serverInfo)) < 0) {
-        perror("connect");
+        perror("[!] Connect");
         close(clientSocket);
         exit(1);
     }
 
-    std::cout << "[+] Connected to the server on port 3423\n";
+    printw("[+] Connected to the server on port 3423\n");
+    refresh();
+
     isConnected = true;
 }
 

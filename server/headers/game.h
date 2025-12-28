@@ -3,5 +3,5 @@
 class Game {
 
 public:
-	bool GenerateMap(int width, int height, int pX, int pY);
+	std::string GenerateMap(int width, int height);
 };

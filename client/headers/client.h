@@ -1,20 +1,23 @@
 #include "includes.h"
 
-// #define SERVER_PORT 6872
+#define MAIN_SERVER_PORT 6872
 #define BUFFER_SIZE 1024
 
 class Socket {
 
-    int clientSocket;
     sockaddr_in serverInfo{};
+    std::vector<std::string> serverPorts;
 
 public:
-	~Socket() { close(clientSocket); }
-	int SERVER_PORT = 0;
 
+    int clientSocket;
+	int SERVER_PORT = MAIN_SERVER_PORT;
 	bool isConnected = false;	
 
-	void SetupSocket();
+	~Socket() { close(clientSocket); }
+
+	void SetupSocket(int port);
+	void ConnectToMainServer();
 	void ConnectToTheServer();
 	std::string ListenToServer();
 	void SendToServer(std::string msg);

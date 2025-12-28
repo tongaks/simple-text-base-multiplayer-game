@@ -27,6 +27,10 @@ public:
 	void PrintMap(int width, int height, MapInfo map);
 	bool HandleBorder(int width, int height, int posX, int posY, int plane, int dir);
 
-	void GetServerList();
+	int GetServerList();
+	void PrintServerListMenu(std::vector<std::string> serverList, int currentSelected);
+
+	// void HandleSelectServer(std::string serverList);
+
 	// int PrintMovementSelection(int posX, int posY);
 };

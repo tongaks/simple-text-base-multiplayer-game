@@ -9,6 +9,8 @@ void Socket::CreateSockets(int count) {
 	srand(time(0));
 	for (int i = 0; i < count; i++) {
 		int port = std::rand() % (9999 + 1 - 4000) + 4000;
+		serverPortList.push_back(std::to_string(port));
+
 		Notice("Port: " + std::to_string(port) + " created.");
 		uServerSockets.emplace_back(std::make_unique<ServerSocket>(port));
 	}
@@ -106,12 +108,25 @@ void Socket::HandleClientConnection(ServerSocket &ss, std::string port, int clie
 
         	// instance request
 			if (message.find("username") != std::string::npos) {
+
 				std::string mapPos = GenerateMap(MAPW, MAPH); // send player coord
 				int mapPosStrLength = mapPos.length();
 				send(clientSocket, mapPos.c_str(), mapPosStrLength, 0);
-				Notice("Instance accepted.");
-			} else if (message.find("servers")) {
+				Notice("Map sent.");
+
+			} else if (message.find("servers") != std::string::npos) {
+				Notice("Client requested server lists");
+				// std::string temp = "servers:";
+				std::string temp = "";
+				for (std::string s : serverPortList) {
+					temp += s + " ";
+				}
+
+				Notice("Sending: " + temp + " to the client.");
+
 				// return list of server sockets
+				int length = temp.length();
+				send(clientSocket, temp.c_str(), length, 0);
 			}
         }
 
@@ -130,22 +145,29 @@ void Socket::HandleClientConnection(ServerSocket &ss, std::string port, int clie
 }
 
 std::string Socket::GenerateMap(int width, int height) {
-	int playerPosX = std::rand() % (width - 2);
-	int playerPosY = std::rand() % (height - 2);
 
-	int exitX = 0;
-	int exitY = 0;
-	while (1) {
-		exitX = std::rand() % (width - 2);
-		exitY = std::rand() % (height - 2);
-		if (exitX != playerPosX && exitY != playerPosY) break;
-	}
+	int exitX = std::rand() % (width - 2);
+	int exitY = std::rand() % (height - 2);
 
-	std::string playerPos = std::to_string(playerPosX) + " " + std::to_string(playerPosY);
 	std::string exitPos = std::to_string(exitX) + " " + std::to_string(exitY);
-	Notice("Map: " + playerPos + " " + exitPos);
+	Notice("Map exit: " + exitPos);
 
-	return playerPos + " " + exitPos;
+	return exitPos;
+
+	// int playerPosX = std::rand() % (width - 2);
+	// int playerPosY = std::rand() % (height - 2);
+
+	// int exitX = 0;
+	// int exitY = 0;
+	// while (1) {
+	// 	exitX = std::rand() % (width - 2);
+	// 	exitY = std::rand() % (height - 2);
+	// 	if (exitX != playerPosX && exitY != playerPosY) break;
+	// }
+
+	// std::string playerPos = std::to_string(playerPosX) + " " + std::to_string(playerPosY);
+	// Notice("Map: " + playerPos + " " + exitPos);
+	// return playerPos + " " + exitPos;
 }
 
 
