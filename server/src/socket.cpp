@@ -48,7 +48,7 @@ void Socket::SetupSocket(ServerSocket &ss) {
     }
 
     Notice("Done setting up the server port [" + std::to_string(ss.port) + "]. Handling incoming connections.");
-    isStarted = true;
+    // isStarted = true;
 
     std::thread ([this, &ss]() {
         HandleIncomingClients(ss);
@@ -76,24 +76,18 @@ void Socket::HandleIncomingClients(ServerSocket &ss) {
 			ss.clientsIP.push_back(clientIP);
 			ss.clientsSocket.push_back(clientSocket);
 
-			std::thread ([
-					this, 
-					port = std::to_string(ss.port), 
-			        socket = clientSocket, 
-			        ip = clientIP,
-			        &ss]() {
+			std::thread ([this, port = std::to_string(ss.port), socket = clientSocket, ip = clientIP, &ss]() {
 			    HandleClientConnection(ss, port, socket, ip);
 			}).detach();
 
-
 			Notice("From: [" + std::to_string(ss.port) + "]: Client [ " + std::string(clientIP) + " ] connected. Handling its connection.");
 		}
-
 	}
 }
 
 
 void Socket::HandleClientConnection(ServerSocket &ss, std::string port, int clientSocket, std::string clientIP) {
+	// create player
 
 	while (true) {
 		char buffer[100];
