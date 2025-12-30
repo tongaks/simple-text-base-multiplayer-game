@@ -12,7 +12,7 @@ struct ServerSocket {
 	std::vector<std::string> clientsIP; 
 	std::mutex clientMutex;
 
-	std::vector<Player> players;
+	std::vector<Player> playersPositions;
 
 	ServerSocket(int p) : port(p) {}
 };
