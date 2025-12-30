@@ -8,9 +8,14 @@ void Socket::CreateSockets(int count) {
 	// generate random port
 	srand(time(0));
 	for (int i = 0; i < count; i++) {
-		int port = std::rand() % (9999 + 1 - 4000) + 4000;
-		serverPortList.push_back(std::to_string(port));
 
+		int port;
+		while (1) {
+			port = std::rand() % (9999 + 1 - 4000) + 4000;
+			if (port != MAIN_SERVER_PORT) break;
+		}
+
+		serverPortList.push_back(std::to_string(port));
 		Notice("Port: " + std::to_string(port) + " created.");
 		uServerSockets.emplace_back(std::make_unique<ServerSocket>(port));
 	}
@@ -19,7 +24,6 @@ void Socket::CreateSockets(int count) {
 	for (const auto& ss : uServerSockets) {
 		SetupSocket(*ss);
 	}
-
 }
 
 
