@@ -1,6 +1,5 @@
 #include "../headers/socket.h"
-#include "../headers/game.h"
-
+// #include "../headers/game.h"
 // to do: set up multiple sockets
 
 void Socket::CreateSockets(int count) {
@@ -104,22 +103,24 @@ void Socket::HandleClientConnection(ServerSocket &ss, std::string port, int clie
 			std::string message(buffer);
 			Notice("[" + port + "] client: " + buffer);
 
-        	// instance request
-			if (message.find("username") != std::string::npos) {
 
-				std::string mapPos = GenerateMap(MAPW, MAPH); // send player coord
+			if (message.find("username") != std::string::npos) {
+				int startPos = message.find(":");
+				std::string pName = message.substr(startPos, message.length()); 
+				Notice("Player name: " + pName);
+
+				// need: need username to pass to GenerateMap
+				// 'cause GenerateMap creates the player instance 
+				std::string mapPos = GenerateMap(MAPW, MAPH);
 				int mapPosStrLength = mapPos.length();
 				send(clientSocket, mapPos.c_str(), mapPosStrLength, 0);
 				Notice("Map sent.");
 
 			} else if (message.find("servers") != std::string::npos) {
 				Notice("Client requested server lists");
-				// std::string temp = "servers:";
 				std::string temp = "";
-				for (std::string s : serverPortList) {
-					temp += s + " ";
-				}
 
+				for (std::string s : serverPortList) temp += s + " ";
 				Notice("Sending: " + temp + " to the client.");
 
 				// return list of server sockets
