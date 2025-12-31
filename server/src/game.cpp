@@ -57,9 +57,11 @@ Player Game::CreatePlayer(std::string pName, MapInfo mInfo) {
 		posY = std::rand() % (mInfo.mapH - 2);
 
 		// check if there's existing position
-		for (const auto& p : this->playersPositions) {
-		    if (p.posX != posX && p.posY != posY) continue;
-		    else break; 
+		if (this->playersPositions.size() > 0) {
+			for (const auto& p : this->playersPositions) {
+			    if (p.posX != posX && p.posY != posY) continue;
+			    else break; 
+			}			
 		}
 
 		if (posX != mInfo.exitX && posY != mInfo.exitY) {

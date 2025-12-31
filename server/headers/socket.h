@@ -57,11 +57,11 @@ public:
 	void HandleIncomingClients(ServerSocket &ss);
 	void HandleClientConnection(ServerSocket &ss, std::string port, int clientSocket, std::string clientIP);
 
-	// MapInfos GenerateMap(int width, int height);
-	// std::vector<int> GenerateMap(int width, int height);
-	// std::string GenerateMap(int width, int height);
-
 	void Notice(std::string msg);
 	void Warning(std::string msg);
 	void Error(std::string msg);
+
+	// MapInfos GenerateMap(int width, int height);
+	// std::vector<int> GenerateMap(int width, int height);
+	// std::string GenerateMap(int width, int height);
 };

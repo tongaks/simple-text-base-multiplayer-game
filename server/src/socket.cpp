@@ -113,7 +113,8 @@ void Socket::HandleClientConnection(ServerSocket &ss, std::string port, int clie
 				// std::vector<int> mapPos = GenerateMap(MAPW, MAPH);
 
 				MapInfo mapPos = GenerateMap(MAPW, MAPH);
-				CreatePlayer(pName, mapPos);
+				Player pTemp = CreatePlayer(pName, mapPos);
+				Notice("Player: " + pName + " created.");
 
 				std::string strMap = std::to_string(mapPos.mapW) + " " + std::to_string(mapPos.mapH) + " " + std::to_string(mapPos.exitX) + " " + std::to_string(mapPos.exitY);
 				int mapPosStrLength = strMap.length();
