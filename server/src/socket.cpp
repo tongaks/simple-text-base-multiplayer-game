@@ -109,11 +109,15 @@ void Socket::HandleClientConnection(ServerSocket &ss, std::string port, int clie
 				std::string pName = message.substr(startPos, message.length()); 
 				Notice("Player name: " + pName);
 
-				// need: need username to pass to GenerateMap
-				// 'cause GenerateMap creates the player instance 
-				std::string mapPos = GenerateMap(MAPW, MAPH);
-				int mapPosStrLength = mapPos.length();
-				send(clientSocket, mapPos.c_str(), mapPosStrLength, 0);
+				// std::string mapPos = GenerateMap(MAPW, MAPH);
+				// std::vector<int> mapPos = GenerateMap(MAPW, MAPH);
+
+				MapInfo mapPos = GenerateMap(MAPW, MAPH);
+				CreatePlayer(pName, mapPos);
+
+				std::string strMap = std::to_string(mapPos.mapW) + " " + std::to_string(mapPos.mapH) + " " + std::to_string(mapPos.exitX) + " " + std::to_string(mapPos.exitY);
+				int mapPosStrLength = strMap.length();
+				send(clientSocket, strMap.c_str(), mapPosStrLength, 0);
 				Notice("Map sent.");
 
 			} else if (message.find("servers") != std::string::npos) {
@@ -143,15 +147,15 @@ void Socket::HandleClientConnection(ServerSocket &ss, std::string port, int clie
     close(clientSocket);
 }
 
-std::string Socket::GenerateMap(int width, int height) {
+// std::string Socket::GenerateMap(int width, int height) {
 
-	int exitX = std::rand() % (width - 2);
-	int exitY = std::rand() % (height - 2);
+// 	int exitX = std::rand() % (width - 2);
+// 	int exitY = std::rand() % (height - 2);
 
-	std::string exitPos = std::to_string(exitX) + " " + std::to_string(exitY);
-	Notice("Map exit: " + exitPos);
+// 	std::string exitPos = std::to_string(exitX) + " " + std::to_string(exitY);
+// 	Notice("Map exit: " + exitPos);
 
-	return exitPos;
+// 	return exitPos;
 
 	// int playerPosX = std::rand() % (width - 2);
 	// int playerPosY = std::rand() % (height - 2);
@@ -167,8 +171,7 @@ std::string Socket::GenerateMap(int width, int height) {
 	// std::string playerPos = std::to_string(playerPosX) + " " + std::to_string(playerPosY);
 	// Notice("Map: " + playerPos + " " + exitPos);
 	// return playerPos + " " + exitPos;
-}
-
+// }
 
 
 

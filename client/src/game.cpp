@@ -193,6 +193,7 @@ int Game::GetServerList() {
 	PrintServerListMenu(serverList, currentSelected);
 	refresh();
 
+	bool selected = false;
 	while((ch = getch()) != 'q') {
 	    switch (ch) {
 	    case 'w':
@@ -201,17 +202,25 @@ int Game::GetServerList() {
 	    case 's':
 	    	if ((currentSelected + 1) != 5) currentSelected += 1;
 	    	break;
-	    case KEY_ENTER:
-	    	// handle select
+	    case KEY_ENTER : case 10 :  case 13:
+
+	    	selected = true;
 	    	break;
+
 	    default:
 	    	break;
 	    }
+
+	    if (selected) break;
 
 	    erase();
 		PrintServerListMenu(serverList, currentSelected);
 		refresh();
 	}
+
+	printw("Selected: %s", serverList[currentSelected].c_str());
+	refresh();
+	getch();
 
 	return currentSelected;
 }

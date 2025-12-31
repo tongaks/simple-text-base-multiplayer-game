@@ -12,10 +12,28 @@ struct Player {
 	}
 };
 
+struct MapInfo {
+	int mapW, mapH, exitX, exitY;
+	MapInfo(int w, int h, int eX, int eY) {
+		this->mapW = w;
+		this->mapH = h;
+		this->exitX = eX;
+		this->exitY = eY;
+	}
+};
+
+
+
 class Game {
 public:
 	std::vector<Player> playersPositions;
 
-	std::string GenerateMap(int width, int height);
+	MapInfo GenerateMap(int width, int height);
+	Player CreatePlayer(std::string pName, MapInfo mInfo);
+
+	// old
+	// int GenerateMap(int width, int height);
+	// std::string GenerateMap(int width, int height);
+	// Player CreatePlayer(std::string pName, int exitX, int exitY);
 	// std::string GenerateMap(int width, int height std::string playerName);
 };
