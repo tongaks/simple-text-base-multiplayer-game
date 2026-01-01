@@ -44,7 +44,7 @@ void Socket::SetupSocket(ServerSocket &ss) {
     }
 
     Notice("Done setting up the server port [" + std::to_string(ss.port) + "]. Handling incoming connections.");
-    isStarted = true;
+    // isStarted = true;
 
     std::thread ([this, &ss]() {
         HandleIncomingClients(ss);

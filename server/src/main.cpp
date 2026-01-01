@@ -3,11 +3,11 @@
 int main() {
 	
 	Socket socket1;
-	
-	Socket socket2;
-	socket2.CreateSockets(5);
 	ServerSocket mainServerSocket(MAIN_SERVER_PORT);
-	socket2.SetupSocket(mainServerSocket);
+	socket1.SetupSocket(mainServerSocket);
+	
+	// socket1.CreateSockets(5);
+	// Socket socket2;
 
 
 	bool stillChoice = true;
@@ -23,7 +23,7 @@ int main() {
 
 		if (choice == 1) {
 			if (!socket1.isStarted) {
-				// socket1.CreateSockets(5);
+				socket1.CreateSockets(5);
 				stillChoice = false;
 			} else {
 				std::cout << "[!] Server is already running.\n";
