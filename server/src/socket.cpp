@@ -122,7 +122,15 @@ void Socket::HandleClientConnection(ServerSocket &ss, int index) {
 				Player pTemp = CreatePlayer(pName, mapPos);
 				Notice("Player: " + pName + " created.");
 
-				std::string strMap = std::to_string(mapPos.mapW) + " " + std::to_string(mapPos.mapH) + " " + std::to_string(mapPos.exitX) + " " + std::to_string(mapPos.exitY);
+				// need to fix: map generation and sending it to the client
+				// need to fix: parsing map
+				// std::string mapWH = std::to_string(mapPos.mapW) + " " + std::to_string(mapPos.mapH);
+				// std::string strMap = std::to_string(mapPos.mapW) + " " + std::to_string(mapPos.mapH) + " " + std::to_string(mapPos.exitX) + " " + std::to_string(mapPos.exitY);
+
+				std::string exitXY = std::to_string(mapPos.exitX) + " " + std::to_string(mapPos.exitY);
+				std::string playerCoord = std::to_string(pTemp.posX) + " " + std::to_string(pTemp.posY);
+				std::string strMap = playerCoord + " " + exitXY;
+
 				Notice("Sending: " + strMap + "to client.");
 				int mapPosStrLength = strMap.length();
 				send(ss.clientsSocket[index], strMap.c_str(), mapPosStrLength, 0);
