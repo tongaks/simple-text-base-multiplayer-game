@@ -15,13 +15,19 @@ int main() {
 	initscr();
 
 	Game game1;
-	game1.SetupSocket(MAIN_SERVER_PORT);
-	// game1.SERVER_PORT = port;
 
 
-	// connect to the main server 1st to retrieve the ports 
-	if (!game1.isConnected) game1.ConnectToTheServer();
+	game1.SetupSocket(game1.mainClientSocket, game1.serverMainInfo, MAIN_SERVER_PORT);
+	if (!game1.isConnected) game1.ConnectToMainServer();
 	game1.GetServerList();
+
+	game1.SetupSocket(game1.clientSocket, game1.serverInfo, game1.selectedServerPort);
+	game1.ConnectToTheServer();
+	game1.Start();
+
+
+	// game1.ConnectToTheServer(game1.selectedServerPort, game1.gameSocket);
+	// game1.Start();
 
 
 	// game1.SetCharacterInfo(name, 100, 10);

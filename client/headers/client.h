@@ -4,23 +4,27 @@
 #define BUFFER_SIZE 1024
 
 class Socket {
+public:
 
+    sockaddr_in serverMainInfo{};
     sockaddr_in serverInfo{};
     std::vector<std::string> serverPorts;
 
-public:
-
-    int clientSocket;
-	int SERVER_PORT = MAIN_SERVER_PORT;
+	int SERVER_PORT;
 	bool isConnected = false;	
 
-	~Socket() { close(clientSocket); }
+    int clientSocket;
+    int mainClientSocket;
 
-	void SetupSocket(int port);
+
+
+	~Socket() { close(clientSocket); }
+	void SetupSocket(int& cSocket, sockaddr_in &server, int port);
+	void GetServerList();
+
 	void ConnectToMainServer();
 	void ConnectToTheServer();
-	std::string ListenToServer();
-	void SendToServer(std::string msg);
 
-	void GetServerList();
+	std::string ListenToServer(int& cSocket);
+	void SendToServer(int& cSocket, std::string msg);
 };

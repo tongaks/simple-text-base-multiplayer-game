@@ -3,7 +3,7 @@
 bool Game::CreateServerSideInstance(std::string name) {
 
 	if (this->isConnected) {
-		SendToServer("username:" + name);
+		SendToServer(mainClientSocket, "username:" + name);
 
 		printw("[+] Instance requested. Waiting for confirmation.\n");
 		refresh();
@@ -11,7 +11,7 @@ bool Game::CreateServerSideInstance(std::string name) {
 		int attempts = 0;
 		while (attempts < 10) {
 
-			std::string msg = ListenToServer();
+			std::string msg = ListenToServer(mainClientSocket);
 			if (msg.find("map")) {
 				printw("%s\n", msg.c_str());
 				refresh();
@@ -166,20 +166,21 @@ void Game::PrintServerListMenu(std::vector<std::string> serverList, int currentS
 
 int Game::GetServerList() {
 	// request server list (sockets?)
-	SendToServer("servers");
+	SendToServer(mainClientSocket, "servers");
     printw("[+] Requesting server list...\n");
     refresh();
 
 	std::vector<std::string> serverList;
+
 	while (1) {
-		std::string reply = ListenToServer();
+		std::string reply = ListenToServer(mainClientSocket);
 
 		if (reply.find("servers:")) {
 			// int pos = reply.find(":");
-			std::string buffer;
-
-			std::stringstream ss(reply);
 			// ss.seekg(pos, std::ios::beg);
+
+			std::string buffer;
+			std::stringstream ss(reply);
 
 			while (ss >> buffer) {
 				serverList.push_back(buffer);
@@ -211,7 +212,10 @@ int Game::GetServerList() {
 	    	break;
 	    }
 
-	    if (selected) break;
+	    if (selected) {
+	    	selectedServerPort = std::stoi(serverList[currentSelected]);
+	    	break;
+	    }
 
 	    erase();
 		PrintServerListMenu(serverList, currentSelected);
@@ -226,9 +230,16 @@ int Game::GetServerList() {
 }
 
 void Game::Start() {
+
+	// && clientSocket == INVALID_SOCKET
+	if (selectedServerPort == 0) {
+		printw("[!!] No server port selected. Quitting\n");
+		refresh();
+		exit(1);
+	}
+
 	int width = 30; 
 	int height = 10;
-
 	bool exitFound = false;
 
 	MapInfo mapInfo = ParseMap(rawMapData);
@@ -271,7 +282,7 @@ void Game::Start() {
 	
 	        case 'e': case 'E': // player pressed e in the exit
 	        	if (playerX == exitX && playerY == exitY) {
-	        		SendToServer("Player: " + this->player_name + " win");
+	        		SendToServer(clientSocket, "Player: " + this->player_name + " win");
 	        		exitFound = true;
 	        	} break;
 
@@ -281,7 +292,7 @@ void Game::Start() {
 
 	    if (allowed) {
 		    std::string data = this->player_name + ":" + std::to_string(playerX) + "," + std::to_string(playerY);
-		    SendToServer(data);
+		    SendToServer(mainClientSocket, data);
 	    } else if (exitFound) {
 	    	erase();
 	    	printw("You found the exit.");
