@@ -1,6 +1,5 @@
 #include "../headers/socket.h"
-#include "../headers/game.h"
-
+// #include "../headers/game.h"
 // to do: set up multiple sockets
 
 void Socket::CreateSockets(int count) {
@@ -8,9 +7,14 @@ void Socket::CreateSockets(int count) {
 	// generate random port
 	srand(time(0));
 	for (int i = 0; i < count; i++) {
-		int port = std::rand() % (9999 + 1 - 4000) + 4000;
-		serverPortList.push_back(std::to_string(port));
 
+		int port;
+		while (1) {
+			port = std::rand() % (9999 + 1 - 4000) + 4000;
+			if (port != MAIN_SERVER_PORT) break;
+		}
+
+		serverPortList.push_back(std::to_string(port));
 		Notice("Port: " + std::to_string(port) + " created.");
 		uServerSockets.emplace_back(std::make_unique<ServerSocket>(port));
 	}
@@ -19,7 +23,6 @@ void Socket::CreateSockets(int count) {
 	for (const auto& ss : uServerSockets) {
 		SetupSocket(*ss);
 	}
-
 }
 
 
@@ -68,91 +71,107 @@ void Socket::HandleIncomingClients(ServerSocket &ss) {
 		{
 			std::lock_guard<std::mutex> lock(ss.clientMutex);
 
+			// std::thread ([this, port = std::to_string(ss.port), socket = clientSocket, ip = clientIP, &ss]() {
+			std::thread ([this, index = ss.clientCount, &ss]() {
+			    // HandleClientConnection(ss, port, socket, ip);
+			    HandleClientConnection(ss, index);
+			}).detach();
+
 			ss.clientCount += 1;
 			ss.clientsIP.push_back(clientIP);
 			ss.clientsSocket.push_back(clientSocket);
 
-			std::thread ([
-					this, 
-					port = std::to_string(ss.port), 
-			        socket = clientSocket, 
-			        ip = clientIP,
-			        &ss]() {
-			    HandleClientConnection(ss, port, socket, ip);
-			}).detach();
-
-
 			Notice("From: [" + std::to_string(ss.port) + "]: Client [ " + std::string(clientIP) + " ] connected. Handling its connection.");
 		}
-
 	}
 }
 
 
-void Socket::HandleClientConnection(ServerSocket &ss, std::string port, int clientSocket, std::string clientIP) {
+// void Socket::HandleClientConnection(ServerSocket &ss, std::string port, int clientSocket, std::string clientIP) {
+void Socket::HandleClientConnection(ServerSocket &ss, int index) {
+	// create player
 
 	while (true) {
-		char buffer[100];
-		int receivedBytes = recv(clientSocket, buffer, sizeof(buffer), 0);
+		char buffer[101];
+		int receivedBytes = recv(ss.clientsSocket[index], buffer, sizeof(buffer) - 1, 0);
+		buffer[receivedBytes] = '\0';
 
 		if (receivedBytes < 0) {
-			std::cerr << "[!] Server port [" << port << "]: Failed to read data sent by IP: " << clientIP << " err code:  " << receivedBytes << "\n";
+			perror("[!!] Recv Error");
+			std::cerr << "[!] Server port [" << ss.port << "]: Failed to read data sent by IP: " << ss.clientsIP[index] << " err code:  " << receivedBytes << "\n";
+			break;
+		} else if (receivedBytes == 0) {
+			std::cout << "A Client disconnected.\n";
 			break;
 		}
 
+
 		if (receivedBytes > 0) {
-
-			buffer[receivedBytes] = '\0';
 			std::string message(buffer);
-			Notice("[" + port + "] client: " + buffer);
+			Notice("[" + std::to_string(ss.port) + "] client: " + buffer);
 
-        	// instance request
 			if (message.find("username") != std::string::npos) {
+				int startPos = message.find(":");
+				std::string pName = message.substr(startPos, message.length()); 
+				Notice("Player name: " + pName);
 
-				std::string mapPos = GenerateMap(MAPW, MAPH); // send player coord
-				int mapPosStrLength = mapPos.length();
-				send(clientSocket, mapPos.c_str(), mapPosStrLength, 0);
+				// std::string mapPos = GenerateMap(MAPW, MAPH);
+				// std::vector<int> mapPos = GenerateMap(MAPW, MAPH);
+
+				MapInfo mapPos = GenerateMap(MAPW, MAPH);
+				Player pTemp = CreatePlayer(pName, mapPos);
+				Notice("Player: " + pName + " created.");
+
+				// need to fix: map generation and sending it to the client
+				// need to fix: parsing map
+				// std::string mapWH = std::to_string(mapPos.mapW) + " " + std::to_string(mapPos.mapH);
+				// std::string strMap = std::to_string(mapPos.mapW) + " " + std::to_string(mapPos.mapH) + " " + std::to_string(mapPos.exitX) + " " + std::to_string(mapPos.exitY);
+
+				std::string exitXY = std::to_string(mapPos.exitX) + " " + std::to_string(mapPos.exitY);
+				std::string playerCoord = std::to_string(pTemp.posX) + " " + std::to_string(pTemp.posY);
+				std::string strMap = playerCoord + " " + exitXY;
+
+				Notice("Sending: " + strMap + "to client.");
+				int mapPosStrLength = strMap.length();
+				send(ss.clientsSocket[index], strMap.c_str(), mapPosStrLength, 0);
 				Notice("Map sent.");
 
 			} else if (message.find("servers") != std::string::npos) {
 				Notice("Client requested server lists");
-				// std::string temp = "servers:";
+
 				std::string temp = "";
-				for (std::string s : serverPortList) {
-					temp += s + " ";
-				}
-
+				for (std::string s : serverPortList) temp += s + " ";
 				Notice("Sending: " + temp + " to the client.");
-
-				// return list of server sockets
-				int length = temp.length();
-				send(clientSocket, temp.c_str(), length, 0);
+				send(ss.clientsSocket[index], temp.c_str(), temp.size(), 0);
 			}
         }
-
-        if (receivedBytes == 0) break;
 	}
 
 
 	{
 	    std::lock_guard<std::mutex> lock(ss.clientMutex);
-	    ss.clientCount--;
-	    ss.clientsSocket.erase(ss.clientsSocket.begin() + clientSocket);
-	    Warning("[" + port +"] client [ " + clientIP + " ]: disconnected.");
+
+		// int clientSocket = ss.clientsSocket[index];
+		close(ss.clientsSocket[index]);
+		ss.clientsSocket.erase(ss.clientsSocket.begin() + index);
+		ss.clientCount--;
+
+	    std::string format = "[" + std::to_string(ss.port) +"] client [ " + ss.clientsIP[index] + " ]: disconnected.";
+	    Warning(format);
     }
     
-    close(clientSocket);
+    close(ss.clientsSocket[index]);
 }
 
-std::string Socket::GenerateMap(int width, int height) {
+// std::string Socket::GenerateMap(int width, int height) {
 
-	int exitX = std::rand() % (width - 2);
-	int exitY = std::rand() % (height - 2);
+// 	int exitX = std::rand() % (width - 2);
+// 	int exitY = std::rand() % (height - 2);
 
-	std::string exitPos = std::to_string(exitX) + " " + std::to_string(exitY);
-	Notice("Map exit: " + exitPos);
+// 	std::string exitPos = std::to_string(exitX) + " " + std::to_string(exitY);
+// 	Notice("Map exit: " + exitPos);
 
-	return exitPos;
+// 	return exitPos;
 
 	// int playerPosX = std::rand() % (width - 2);
 	// int playerPosY = std::rand() % (height - 2);
@@ -168,8 +187,7 @@ std::string Socket::GenerateMap(int width, int height) {
 	// std::string playerPos = std::to_string(playerPosX) + " " + std::to_string(playerPosY);
 	// Notice("Map: " + playerPos + " " + exitPos);
 	// return playerPos + " " + exitPos;
-}
-
+// }
 
 
 

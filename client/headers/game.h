@@ -17,8 +17,8 @@ public:
 		int exitPosY;
 	};
 
+	int selectedServerPort = 0;
 	MapInfo ParseMap(std::string mapInfo);
-
 	std::string rawMapData;
 
 	void Start();
@@ -30,7 +30,7 @@ public:
 	int GetServerList();
 	void PrintServerListMenu(std::vector<std::string> serverList, int currentSelected);
 
-	// void HandleSelectServer(std::string serverList);
 
+	// void HandleSelectServer(std::string serverList);
 	// int PrintMovementSelection(int posX, int posY);
 };

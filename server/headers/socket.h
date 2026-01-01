@@ -1,4 +1,5 @@
 #include "includes.h"
+#include "game.h"
 
 #define MAIN_SERVER_PORT 6872
 
@@ -15,7 +16,7 @@ struct ServerSocket {
 	ServerSocket(int p) : port(p) {}
 };
 
-class Socket {
+class Socket : public Game {
 
 	const int MAPW = 30;
 	const int MAPH = 10;
@@ -54,11 +55,14 @@ public:
 	void SetupSocket(ServerSocket &ss);
 
 	void HandleIncomingClients(ServerSocket &ss);
-	void HandleClientConnection(ServerSocket &ss, std::string port, int clientSocket, std::string clientIP);
-
-	std::string GenerateMap(int width, int height);
+	void HandleClientConnection(ServerSocket &ss, int index);
 
 	void Notice(std::string msg);
 	void Warning(std::string msg);
 	void Error(std::string msg);
+
+	// void HandleClientConnection(ServerSocket &ss, std::string port, int clientSocket, std::string clientIP);
+	// MapInfos GenerateMap(int width, int height);
+	// std::vector<int> GenerateMap(int width, int height);
+	// std::string GenerateMap(int width, int height);
 };
