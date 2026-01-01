@@ -25,6 +25,19 @@ void Socket::SetupSocket(int& cSocket, sockaddr_in &server, int port) {
 }
 
 
+// one function connection
+// void Socket::ConnectToServerPort(int& cSocket, sockaddr_in &addr) {
+//     if (connect(cSocket, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
+//         perror("[!!] Error on connecting to server");
+//         close(mainClientSocket);
+//         exit(1);
+//     }
+
+//     std::string format = "[+] Connected to server on port [" + std::to_string(MAIN_SERVER_PORT) + "]\n";
+//     printw(format.c_str());
+//     refresh();
+// }
+
 void Socket::ConnectToMainServer() {
     if (connect(mainClientSocket, (struct sockaddr*)&serverMainInfo, sizeof(serverMainInfo)) < 0) {
         perror("[!!] Error on connecting to main server: ");
@@ -49,6 +62,8 @@ void Socket::ConnectToTheServer() {
     // printw("[+] Connected to the server on port [%s]\n", std::to_string(selectedServerPort));
     printw("[+] Connected to the server on port\n");
     refresh();
+
+    isConnected = true;
 }
 
 

@@ -3,7 +3,7 @@
 bool Game::CreateServerSideInstance(std::string name) {
 
 	if (this->isConnected) {
-		SendToServer(mainClientSocket, "username:" + name);
+		SendToServer(clientSocket, "username:" + name);
 
 		printw("[+] Instance requested. Waiting for confirmation.\n");
 		refresh();
@@ -11,7 +11,7 @@ bool Game::CreateServerSideInstance(std::string name) {
 		int attempts = 0;
 		while (attempts < 10) {
 
-			std::string msg = ListenToServer(mainClientSocket);
+			std::string msg = ListenToServer(clientSocket);
 			if (msg.find("map")) {
 				printw("%s\n", msg.c_str());
 				refresh();
@@ -77,7 +77,7 @@ void Game::PrintMap(int width, int height, MapInfo map) {
         }
     }
 
-    printw("\n\n[x: %i] [y: %i]", playerX, playerY);
+    printw("\n\n[x: %i] [y: %i]", map.playerPosX, map.playerPosY);
     refresh();
 }
 
@@ -110,6 +110,7 @@ bool Game::HandleBorder(int width, int height, int posX, int posY, int plane, in
 }
 
 void Game::PrintServerListMenu(std::vector<std::string> serverList, int currentSelected) {
+	erase();
     printw("\n\n========== Server list ==========\n");
     refresh();
 
@@ -256,7 +257,7 @@ void Game::Start() {
 
 	    if (allowed) {
 		    std::string data = this->player_name + ":" + std::to_string(playerX) + "," + std::to_string(playerY);
-		    SendToServer(mainClientSocket, data);
+		    SendToServer(clientSocket, data);
 	    } else if (exitFound) {
 	    	erase();
 	    	printw("You found the exit.");

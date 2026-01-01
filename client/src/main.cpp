@@ -4,10 +4,6 @@
 
 int main() {
 
-	// int port;
-	// std::cout << "Enter server port: ";
-	// std::cin >> port;
-
 	std::string name;
 	std::cout << "Enter your name: ";
 	std::getline(std::cin, name);
@@ -21,7 +17,8 @@ int main() {
 
 	game1.SetupSocket(game1.clientSocket, game1.serverInfo, game1.selectedServerPort);
 	game1.ConnectToTheServer();
-	game1.Start();
+	if (game1.CreateServerSideInstance(name)) 
+		game1.Start();
 
 
 	// game1.ConnectToTheServer(game1.selectedServerPort, game1.gameSocket);
