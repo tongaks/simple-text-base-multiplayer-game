@@ -109,42 +109,6 @@ bool Game::HandleBorder(int width, int height, int posX, int posY, int plane, in
 	return true; // allow movement
 }
 
-// void Game::HandleSelectServer(std::string serverList) {
-// 	int ch;
-	// while((ch = getch()) != 'q') { 
-
-	//     printw("\n\n========== Server list ==========\n");
-	//     refresh();
-
-	//     // loop through server list
-	// 	int currentSelected = 0;
-	//     int count = 0;
-	//     for (std::string s : serverList) {
-	//     	printw("%i. %s", count+1, s.c_str());
-	//     	if (count == currentSelected) printw(" <-");
-	//     	printw("\n");
-	//     	refresh();
-
-	//     	count++;
-	//     }
-
-	//     printw("========== Server list ==========");
-	//     refresh();
-
-	//     switch (ch) {
-	//     case 'w':
-	//     	if (currentSelected > 1) currentSelected -= 1;
-	//     	break;
-	//     case 's':
-	//     	if (currentSelected < 5) currentSelected += 1;
-	//     	break;
-	//     default:
-	//     	break;
-	//     }
-
-	// }
-// }
-
 void Game::PrintServerListMenu(std::vector<std::string> serverList, int currentSelected) {
     printw("\n\n========== Server list ==========\n");
     refresh();
@@ -165,10 +129,10 @@ void Game::PrintServerListMenu(std::vector<std::string> serverList, int currentS
 }
 
 int Game::GetServerList() {
-	// request server list (sockets?)
-	SendToServer(mainClientSocket, "servers");
     printw("[+] Requesting server list...\n");
     refresh();
+
+	SendToServer(mainClientSocket, "servers");
 
 	std::vector<std::string> serverList;
 

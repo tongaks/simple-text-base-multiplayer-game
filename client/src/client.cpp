@@ -9,24 +9,30 @@ void Socket::SetupSocket(int& cSocket, sockaddr_in &server, int port) {
         exit(1);
     }
 
+    // clear
+    memset(&server, 0, sizeof(server));
     server.sin_family = AF_INET;
     server.sin_port = htons(port);
 
     if (inet_pton(AF_INET, "127.0.0.1", &server.sin_addr) <= 0) {
-        perror("inet_pton");
+        perror("[!!] inet_pton");
         close(cSocket);
         exit(1);
     }
+
+    printw("[+] Done setting up the socket.\n");
+    refresh();
 }
 
 
 void Socket::ConnectToMainServer() {
     if (connect(mainClientSocket, (struct sockaddr*)&serverMainInfo, sizeof(serverMainInfo)) < 0) {
         perror("[!!] Error on connecting to main server: ");
-        close(clientSocket);
+        close(mainClientSocket);
         exit(1);
     }
 
+    isConnectedToMain = true;
     std::string format = "[+] Connected to main server on port [" + std::to_string(MAIN_SERVER_PORT) + "]\n";
     printw(format.c_str());
     refresh();
@@ -47,8 +53,12 @@ void Socket::ConnectToTheServer() {
 
 
 void Socket::SendToServer(int& cSocket, std::string msg) {
-    const char* info = msg.c_str();
-    send(cSocket, info, strlen(info), 0);
+    const char* info = (msg + '\0').c_str();
+    int res = send(cSocket, info, strlen(info), 0);
+    if (res < 0) {
+        perror("[!] Send error");
+        refresh();
+    }
 }
 
 

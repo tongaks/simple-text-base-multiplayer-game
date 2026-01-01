@@ -8,10 +8,12 @@ public:
 
     sockaddr_in serverMainInfo{};
     sockaddr_in serverInfo{};
-    std::vector<std::string> serverPorts;
 
+	bool isConnectedToMain = false;
+	bool isConnected = false;
+
+    std::vector<std::string> serverPorts;
 	int SERVER_PORT;
-	bool isConnected = false;	
 
     int clientSocket;
     int mainClientSocket;
