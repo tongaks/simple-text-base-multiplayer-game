@@ -17,6 +17,7 @@ public:
 		int exitPosY;
 	};
 
+	std::string playerName;
 	int selectedServerPort = 0;
 	MapInfo ParseMap(std::string mapInfo);
 	std::string rawMapData;

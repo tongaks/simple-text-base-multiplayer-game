@@ -13,6 +13,9 @@ struct ServerSocket {
 	std::vector<std::string> clientsIP; 
 	std::mutex clientMutex;
 
+	MapInfo map;
+	std::vector<Player> players;
+
 	ServerSocket(int p) : port(p) {}
 };
 
@@ -21,12 +24,8 @@ class Socket : public Game {
 	const int MAPW = 30;
 	const int MAPH = 10;
 
-	// server (old) maybe use this as the main port
 	int serverMainPort = 6872;
 	int serverMainSocket = 0;
-	// struct sockaddr_in serverInfo;
-
-	// client related
 
 public:
 

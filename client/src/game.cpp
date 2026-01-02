@@ -10,7 +10,6 @@ bool Game::CreateServerSideInstance(std::string name) {
 
 		int attempts = 0;
 		while (attempts < 10) {
-
 			std::string msg = ListenToServer(clientSocket);
 			if (msg.find("map")) {
 				printw("%s\n", msg.c_str());
@@ -37,9 +36,24 @@ bool Game::CreateServerSideInstance(std::string name) {
 
 Game::MapInfo Game::ParseMap(std::string mapInfo) {
 	std::stringstream ss(mapInfo);
+	std::stringstream counter(mapInfo);
 	std::string buffer;
 
 	MapInfo processedMap;
+
+	// int playerCount = 0;
+	// while (counter >> buffer) playerCount++;
+
+	// std::vector<std::vector<int>> playersCoordinate;
+
+	// std::vector<int> tempVec;
+	// while (ss >> buffer) {
+	// 	tempVec.push_back(buffer);
+	// 	if (tempVec.size() > 1) {
+	// 		playersCoordinate.push_back(tempVec);
+	// 		tempVec.clear();
+	// 	}
+	// }
 
 	int count = 0;
 	while (ss >> buffer) {
@@ -247,7 +261,7 @@ void Game::Start() {
 	
 	        case 'e': case 'E': // player pressed e in the exit
 	        	if (playerX == exitX && playerY == exitY) {
-	        		SendToServer(clientSocket, "Player: " + this->player_name + " win");
+	        		SendToServer(clientSocket, "Player: " + player_name + " win");
 	        		exitFound = true;
 	        	} break;
 
@@ -256,8 +270,18 @@ void Game::Start() {
 	    }
 
 	    if (allowed) {
-		    std::string data = this->player_name + ":" + std::to_string(playerX) + "," + std::to_string(playerY);
+		    // std::string data = player_name + " coord: (" + std::to_string(playerX) + "," + std::to_string(playerY) + ")";
+		    std::string data = playerName + ".coord:" + std::to_string(playerX) + "," + std::to_string(playerY);
 		    SendToServer(clientSocket, data);
+
+		    // parse map sent by the server again
+		    std::string newRawMap = ListenToServer(clientSocket);
+			mapInfo = ParseMap(newRawMap);
+			playerX = mapInfo.playerPosX;
+			playerY = mapInfo.playerPosY;
+			exitX = mapInfo.exitPosX;
+			exitY = mapInfo.exitPosY;
+
 	    } else if (exitFound) {
 	    	erase();
 	    	printw("You found the exit.");

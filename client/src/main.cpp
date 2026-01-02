@@ -8,16 +8,18 @@ int main() {
 	std::cout << "Enter your name: ";
 	std::getline(std::cin, name);
 
-	initscr();
 
+	initscr();
 	Game game1;
+	game1.playerName = name;
+
 	game1.SetupSocket(game1.mainClientSocket, game1.serverMainInfo, MAIN_SERVER_PORT);
 	if (!game1.isConnectedToMain) game1.ConnectToMainServer();
 	game1.GetServerList();
 
 	game1.SetupSocket(game1.clientSocket, game1.serverInfo, game1.selectedServerPort);
 	game1.ConnectToTheServer();
-	if (game1.CreateServerSideInstance(name)) 
+	if (game1.CreateServerSideInstance(game1.playerName)) 
 		game1.Start();
 
 

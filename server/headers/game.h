@@ -14,12 +14,19 @@ struct Player {
 
 struct MapInfo {
 	int mapW, mapH, exitX, exitY;
-	MapInfo(int w, int h, int eX, int eY) {
+	void Setup(int w, int h, int eX, int eY) {
 		this->mapW = w;
 		this->mapH = h;
 		this->exitX = eX;
 		this->exitY = eY;
-	}
+	}	
+
+	// MapInfo(int w, int h, int eX, int eY) {
+	// 	this->mapW = w;
+	// 	this->mapH = h;
+	// 	this->exitX = eX;
+	// 	this->exitY = eY;
+	// }
 };
 
 

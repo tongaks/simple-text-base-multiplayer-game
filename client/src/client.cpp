@@ -68,8 +68,10 @@ void Socket::ConnectToTheServer() {
 
 
 void Socket::SendToServer(int& cSocket, std::string msg) {
-    const char* info = (msg + '\0').c_str();
-    int res = send(cSocket, info, strlen(info), 0);
+    // const char* info = (msg + '\0').c_str();
+    size_t msgLength = msg.length();
+    int res = send(cSocket, msg.c_str(), msgLength, 0);
+
     if (res < 0) {
         perror("[!] Send error");
         refresh();
