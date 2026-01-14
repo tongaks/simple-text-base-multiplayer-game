@@ -2,36 +2,62 @@
 #include "client.h"
 #include "character.h"
 
-class Game : public Socket, public Character {
+struct Player {
+	std::string playerName;
+	int playerX, playerY;
 
-	int playerX;
-	int playerY;
+	void Setup(std::string n, int pX, int pY) {
+		this->playerName = n;
+		this->playerX = pX;
+		this->playerY = pY;
+	}
+};
+
+struct MapInfo {
+	// old 
+	// int exitPosX, exitPosY;
+	// int playerPosX, playerPosY;
+	// int mapW, mapH;
+
+
+	// new
+	std::vector<Player> currentPlayers;
+	int exitX, exitY;
+	int mapW, mapH;
+
+	void Setup(int w, int h, int x, int y, Player p) {
+		this->mapW = w;
+		this->mapH = h;
+		this->exitX = x;
+		this->exitY = y;
+
+		currentPlayers.push_back(p);
+	}
+};
+
+
+class Game : public Socket, public Character {
+	int playerX, playerY;
 
 public:
 
-	struct MapInfo {
-		int playerPosX;
-		int playerPosY;
-
-		int exitPosX;
-		int exitPosY;
-	};
-
 	std::string playerName;
 	int selectedServerPort = 0;
-	MapInfo ParseMap(std::string mapInfo);
 	std::string rawMapData;
+
+	MapInfo ParseMap(std::string mapInfo);
+	MapInfo GetMapInfo(std::string mapInfo);
+	void UpdateCoord(std::string msg, MapInfo& map);
 
 	void Start();
 	bool CreateServerSideInstance(std::string name); 
+
+	void ListenForNewPlayers(MapInfo& map);
+
 
 	void PrintMap(int width, int height, MapInfo map);
 	bool HandleBorder(int width, int height, int posX, int posY, int plane, int dir);
 
 	int GetServerList();
 	void PrintServerListMenu(std::vector<std::string> serverList, int currentSelected);
-
-
-	// void HandleSelectServer(std::string serverList);
-	// int PrintMovementSelection(int posX, int posY);
 };

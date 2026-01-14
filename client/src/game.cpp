@@ -11,9 +11,10 @@ bool Game::CreateServerSideInstance(std::string name) {
 		int attempts = 0;
 		while (attempts < 10) {
 			std::string msg = ListenToServer(clientSocket);
-			if (msg.find("map")) {
-				printw("%s\n", msg.c_str());
+			if (msg.find("map") != std::string::npos) {
+				printw("[+] Map info: %s\n", msg.c_str());
 				refresh();
+				getch();
 
 				rawMapData = msg;
 				break;
@@ -22,6 +23,13 @@ bool Game::CreateServerSideInstance(std::string name) {
 	        attempts++;
 	        std::this_thread::sleep_for(std::chrono::seconds(3));
 		} 
+
+		if (attempts == 10) {
+			printw("Failed to create server instance.");
+			refresh();
+			getch();
+			exit(1);
+		}
 
 		erase();
 		return true;
@@ -34,64 +42,116 @@ bool Game::CreateServerSideInstance(std::string name) {
 	}
 }
 
-Game::MapInfo Game::ParseMap(std::string mapInfo) {
-	std::stringstream ss(mapInfo);
-	std::stringstream counter(mapInfo);
-	std::string buffer;
 
+MapInfo Game::GetMapInfo(std::string mapInfo) {
 	MapInfo processedMap;
+	Player playerTemp;
 
-	// int playerCount = 0;
-	// while (counter >> buffer) playerCount++;
+	// new
+	int exitX, exitY, playerX, playerY, width, height;
+	if (sscanf(mapInfo.c_str(), "map.info:%d,%d,%d,%d,%d,%d", 
+		&width, &height, &exitX, &exitY, &playerX, &playerY) == 2) {
 
-	// std::vector<std::vector<int>> playersCoordinate;
-
-	// std::vector<int> tempVec;
-	// while (ss >> buffer) {
-	// 	tempVec.push_back(buffer);
-	// 	if (tempVec.size() > 1) {
-	// 		playersCoordinate.push_back(tempVec);
-	// 		tempVec.clear();
-	// 	}
-	// }
-
-	int count = 0;
-	while (ss >> buffer) {
-		printw("%s\n", buffer.c_str());
-		refresh();
-
-		if (count == 0) processedMap.playerPosX = std::stoi(buffer);
-		if (count == 1) processedMap.playerPosY = std::stoi(buffer);
-		if (count == 2) processedMap.exitPosX = std::stoi(buffer);
-		if (count == 3) processedMap.exitPosY = std::stoi(buffer);
-
-		// getch();
-		count++;
+		playerTemp.Setup(playerName, playerX, playerY);
+		processedMap.currentPlayers.push_back(playerTemp);
 	}
 
 	return processedMap;
 }
+
+
+void Game::UpdateCoord(std::string msg, MapInfo& map) {
+    int x, y;
+    char name[50];
+    if (sscanf(msg.c_str(), "%[^.].coord:%d,%d", name, &x, &y) == 3) {
+        for (auto& p : map.currentPlayers) {
+            if (p.playerName == name) {
+                p.playerX = x;
+                p.playerY = y;
+            }
+        }
+    }
+}
+
+
+// MapInfo Game::ParseMap(std::string mapInfo) {
+// 	std::stringstream ss(mapInfo);
+// 	std::stringstream counter(mapInfo);
+// 	std::string buffer;
+
+// 	MapInfo processedMap;
+
+// 	// new
+// 	// int x, y;
+// 	// if (sscanf(mapInfo.c_str(), playerName + ".coord:%d,%d", &x, &y) == 2) {
+// 	// 	for (Player p : mapInfo.currentPlayers) {
+// 	// 		if (p.playerName == playerName) {}
+// 	// 	}
+// 	// }
+
+// 	int count = 0;
+// 	while (ss >> buffer) {
+// 		printw("%s\n", buffer.c_str());
+// 		refresh();
+
+// 		if (count == 0) processedMap.playerPosX = std::stoi(buffer);
+// 		if (count == 1) processedMap.playerPosY = std::stoi(buffer);
+// 		if (count == 2) processedMap.exitPosX = std::stoi(buffer);
+// 		if (count == 3) processedMap.exitPosY = std::stoi(buffer);
+
+// 		// getch();
+// 		count++;
+// 	}
+
+// 	return processedMap;
+// }
 
 void Game::PrintMap(int width, int height, MapInfo map) {
     refresh();
     erase();
     refresh();
 
+    // get the numver of players
+    // int playerCount = map.currentPlayers.size();
+
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
 
-            if (y == 0 || y == height - 1 || x == 0 || x == width - 1) {
-                mvaddch(y, x, '#');
-            } else if (x == map.playerPosX + 1 && y == map.playerPosY + 1) {
-                mvaddch(y, x, 'P');
-            } else if (x == map.exitPosX + 1 && y == map.exitPosY + 1) {
-                mvaddch(y, x, 'E');
-            }
+        	// update this
+			for (int y = 0; y < height; y++) {
+			    for (int x = 0; x < width; x++) {
+			        if (y == 0 || y == height - 1 || x == 0 || x == width - 1) {
+			            mvaddch(y, x, '#');
+			        } else if (x == map.exitX + 1 && y == map.exitY + 1) {
+			            mvaddch(y, x, 'E');
+			        } else {
+			            mvaddch(y, x, ' '); // Clear the internal space
+			        }
+			    }
+			}
 
+            // for (; playerCount > 0 ;) {
+            // 	int playerPosX = map.currentPlayers[playerCount].playerX;
+            // 	int playerPosY = map.currentPlayers[playerCount].playerY;
+	        //     if (x == playerPosX + 1 && y == playerPosY + 1) {
+	        //         mvaddch(y, x, 'P');
+	        //         playerCount--;
+	        //     }
+            // }
+
+            // old
+            // if (y == 0 || y == height - 1 || x == 0 || x == width - 1) {
+            //     mvaddch(y, x, '#');
+            // } else if (x == map.playerPosX + 1 && y == map.playerPosY + 1) {
+            //     mvaddch(y, x, 'P');
+            // } else if (x == map.exitPosX + 1 && y == map.exitPosY + 1) {
+            //     mvaddch(y, x, 'E');
+            // }
         }
     }
 
-    printw("\n\n[x: %i] [y: %i]", map.playerPosX, map.playerPosY);
+    // printw("\n\n[x: %i] [y: %i]", map.playerPosX, map.playerPosY);
+    printw("Done printing map.");
     refresh();
 }
 
@@ -208,6 +268,23 @@ int Game::GetServerList() {
 	return currentSelected;
 }
 
+void Game::ListenForNewPlayers(MapInfo& map) {
+    while (1) {
+        std::string msg = ListenToServer(clientSocket);
+
+        int x, y;
+        char name[50];
+        if (sscanf(msg.c_str(), "%[^.].coord:%d,%d", name, &x, &y) == 3) {
+            for (auto& p : map.currentPlayers) {
+                if (p.playerName == name) {
+                    p.playerX = x;
+                    p.playerY = y;
+                }
+            }
+        }
+    }
+}
+
 void Game::Start() {
 
 	// && clientSocket == INVALID_SOCKET
@@ -217,18 +294,37 @@ void Game::Start() {
 		exit(1);
 	}
 
-	int width = 30; 
-	int height = 10;
 	bool exitFound = false;
 
-	MapInfo mapInfo = ParseMap(rawMapData);
-	int& playerX = mapInfo.playerPosX;
-	int& playerY = mapInfo.playerPosY;
-	int& exitX = mapInfo.exitPosX;
-	int& exitY = mapInfo.exitPosY;
+	// old
+	// int width = 30; 
+	// int height = 10;
+	// MapInfo mapInfo = ParseMap(rawMapData);
+	// int& playerX = mapInfo.playerPosX;
+	// int& playerY = mapInfo.playerPosY;
+	// int& exitX = mapInfo.exitPosX;
+	// int& exitY = mapInfo.exitPosY;
+
+	// PrintMap(width, height, mapInfo);
+	// refresh();
+
+	// new 
+	MapInfo mapInfo = GetMapInfo(rawMapData);
+	std::thread([this, &mapInfo]() {
+		ListenForNewPlayers(mapInfo);
+	}).detach();
+
+	printw("Thread detached. Press any key to print the map");
+	refresh();
+	getch();
+
+	int width = mapInfo.mapW;
+	int height = mapInfo.mapH;
 
 	PrintMap(width, height, mapInfo);
 	refresh();
+	getch();
+
 
 	int ch;
 	while((ch = getch()) != 'q') { 
@@ -259,11 +355,11 @@ void Game::Start() {
 	                allowed = true;
 	            } break;
 	
-	        case 'e': case 'E': // player pressed e in the exit
-	        	if (playerX == exitX && playerY == exitY) {
-	        		SendToServer(clientSocket, "Player: " + player_name + " win");
-	        		exitFound = true;
-	        	} break;
+	        // case 'e': case 'E': // player pressed e in the exit
+	        // 	if (playerX == exitX && playerY == exitY) {
+	        // 		SendToServer(clientSocket, "Player: " + player_name + " win");
+	        // 		exitFound = true;
+	        // 	} break;
 
 	        default:
 	            break;
@@ -274,13 +370,16 @@ void Game::Start() {
 		    std::string data = playerName + ".coord:" + std::to_string(playerX) + "," + std::to_string(playerY);
 		    SendToServer(clientSocket, data);
 
+		    std::string newCoord = ListenToServer(clientSocket);
+			UpdateCoord(newCoord, mapInfo);
+
 		    // parse map sent by the server again
-		    std::string newRawMap = ListenToServer(clientSocket);
-			mapInfo = ParseMap(newRawMap);
-			playerX = mapInfo.playerPosX;
-			playerY = mapInfo.playerPosY;
-			exitX = mapInfo.exitPosX;
-			exitY = mapInfo.exitPosY;
+		    // std::string newRawMap = ListenToServer(clientSocket);
+			// mapInfo = ParseMap(newRawMap);
+			// playerX = mapInfo.playerPosX;
+			// playerY = mapInfo.playerPosY;
+			// exitX = mapInfo.exitPosX;
+			// exitY = mapInfo.exitPosY;
 
 	    } else if (exitFound) {
 	    	erase();

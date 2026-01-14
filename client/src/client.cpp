@@ -25,6 +25,7 @@ void Socket::SetupSocket(int& cSocket, sockaddr_in &server, int port) {
 }
 
 
+// new
 // one function connection
 // void Socket::ConnectToServerPort(int& cSocket, sockaddr_in &addr) {
 //     if (connect(cSocket, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
@@ -77,7 +78,6 @@ void Socket::SendToServer(int& cSocket, std::string msg) {
         refresh();
     }
 }
-
 
 std::string Socket::ListenToServer(int& cSocket) {
 	char buffer[BUFFER_SIZE];

@@ -13,6 +13,7 @@ int main() {
 	Game game1;
 	game1.playerName = name;
 
+	// connect to main port
 	game1.SetupSocket(game1.mainClientSocket, game1.serverMainInfo, MAIN_SERVER_PORT);
 	if (!game1.isConnectedToMain) game1.ConnectToMainServer();
 	game1.GetServerList();
@@ -21,17 +22,6 @@ int main() {
 	game1.ConnectToTheServer();
 	if (game1.CreateServerSideInstance(game1.playerName)) 
 		game1.Start();
-
-
-	// game1.ConnectToTheServer(game1.selectedServerPort, game1.gameSocket);
-	// game1.Start();
-
-
-	// game1.SetCharacterInfo(name, 100, 10);
-	// if (game1.CreateServerSideInstance(name)) {
-	// 	std::cout << "[+] Instance created. Continueing.\n";
-	// 	game1.Start();
-	// } else std::cerr << "[!] Failed to create instance. Exiting.\n";
 
 	return 0;
 }
