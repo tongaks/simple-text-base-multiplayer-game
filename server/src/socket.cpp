@@ -105,23 +105,43 @@ void Socket::HandleClientConnection(ServerSocket &ss, int index) {
 			if (message.find("username") != std::string::npos) {
 				int startPos = message.find(":");
 				std::string pName = message.substr(startPos+1, message.length()); 
-				Notice("Player name: " + pName);
 
 				Player pTemp = CreatePlayer(pName, ss.map);
-				ss.players.push_back(pTemp);
+				ss.currentPlayers.push_back(pTemp);				// store the player
 				Notice("Player: " + pName + " created.");
 
+				// old
 				// MapInfo mapPos = GenerateMap(MAPW, MAPH);
 				// std::string exitXY = std::to_string(mapPos.exitX) + " " + std::to_string(mapPos.exitY);
-				std::string exitXY = std::to_string(ss.map.exitX) + " " + std::to_string(ss.map.exitY);
-				std::string playerCoord = std::to_string(pTemp.posX) + " " + std::to_string(pTemp.posY);
-				std::string strMap = playerCoord + " " + exitXY;
+				// std::string exitXY = std::to_string(ss.map.exitX) + " " + std::to_string(ss.map.exitY);
+				// std::string playerCoord = std::to_string(pTemp.posX) + " " + std::to_string(pTemp.posY);
+				// std::string strMap = playerCoord + " " + exitXY;
+
+
+				// new: for client new ParseInitialMap
+				std::string exitXY = std::to_string(ss.map.exitX) + "," + std::to_string(ss.map.exitY);
+				std::string playerCoord = std::to_string(pTemp.posX) + "," + std::to_string(pTemp.posY);
+				std::string mapSize = std::to_string(ss.map.mapW) + "," + std::to_string(ss.map.mapH);
+				std::string strMap = "map.info:" + mapSize + "," + exitXY + "," + playerCoord;
 
 
 				Notice("Sending coordinates: " + strMap + " to client.");
 				int mapPosStrLength = strMap.length();
 				send(ss.clientsSocket[index], strMap.c_str(), mapPosStrLength, 0);
 				Notice("Map sent.");
+
+				// update other clients, only if there's more than 1 players
+				if (ss.clientsSocket.size() > 1) {
+					Notice("Updating clients about the new player.");
+
+					std::string updateClients = pName + ".coord:" + playerCoord;
+					int iterator = 0;
+					for (int& client : ss.clientsSocket) {
+						if (iterator == index) continue;
+						send(client, updateClients.c_str(), updateClients.length(), 0);
+					}
+				}
+
 
 			} else if (message.find("servers") != std::string::npos) {
 				Notice("Client requested server lists");
@@ -131,30 +151,41 @@ void Socket::HandleClientConnection(ServerSocket &ss, int index) {
 				Notice("Sending ports: " + temp + " to the client.");
 				send(ss.clientsSocket[index], temp.c_str(), temp.size(), 0);
 
+				
+				// handler for when client sent a update coord
 			} else if (message.find("coord") != std::string::npos) {
-				char name[50];
-				int x, y;
 
+				int x, y;
+				char name[50];
 				if (sscanf(message.c_str(), "%[^.].coord:%d,%d", name, &x, &y) == 3) {
-				    // Notice("Name: " + std::string(name));
-					for (auto& p : ss.players) {
+
+					std::string exitXY, playerCoord, strMap;
+					for (auto& p : ss.currentPlayers) {
 						if (name == p.playerName) {
 							p.posX = x;
 							p.posY = y;
 
-							std::string exitXY = std::to_string(ss.map.exitX) + " " + std::to_string(ss.map.exitY);
-							std::string playerCoord = std::to_string(p.posX) + " " + std::to_string(p.posY);
-							std::string strMap = playerCoord + " " + exitXY;
-							int mapPosStrLength = strMap.length();
-							send(ss.clientsSocket[index], strMap.c_str(), mapPosStrLength, 0);
-
-							// Notice("Sending coordinates: " + strMap + " to client.");
-							// Notice("Map sent.");
+							exitXY = std::to_string(ss.map.exitX) + " " + std::to_string(ss.map.exitY);
+							playerCoord = std::to_string(p.posX) + " " + std::to_string(p.posY);
+							strMap = playerCoord + " " + exitXY;
 						}
 					}
+
+					// todo: update client code to handle this
+					// send to all client the newly updated position of a player
+					int mapPosStrLength = strMap.length();
+					for (int& client : ss.clientsSocket) {
+						send(client, strMap.c_str(), mapPosStrLength, 0);
+					}
+
+
 				}
 			}
         }
+
+		// Notice("Sending coordinates: " + strMap + " to client.");
+		// Notice("Map sent.");
+		// Notice("Map sent to player: " + p.playerName);
 	}
 
 

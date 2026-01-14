@@ -14,7 +14,7 @@ struct ServerSocket {
 	std::mutex clientMutex;
 
 	MapInfo map;
-	std::vector<Player> players;
+	std::vector<Player> currentPlayers;
 
 	ServerSocket(int p) : port(p) {}
 };

@@ -34,6 +34,8 @@ struct MapInfo {
 class Game {
 public:
 	std::vector<Player> playersPositions;
+	std::vector<std::vector<int>> playersPositionsTemp;
+	
 
 	MapInfo GenerateMap(int width, int height);
 	Player CreatePlayer(std::string pName, MapInfo mInfo);
