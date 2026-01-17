@@ -1,3 +1,6 @@
+#ifndef SOCKET_H
+#define SOCKET_H
+
 #include "includes.h"
 #include "game.h"
 
@@ -65,3 +68,5 @@ public:
 	// std::vector<int> GenerateMap(int width, int height);
 	// std::string GenerateMap(int width, int height);
 };
+
+#endif

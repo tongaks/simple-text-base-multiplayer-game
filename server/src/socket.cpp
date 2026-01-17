@@ -106,7 +106,7 @@ void Socket::HandleClientConnection(ServerSocket &ss, int index) {
 				int startPos = message.find(":");
 				std::string pName = message.substr(startPos+1, message.length()); 
 
-				Player pTemp = CreatePlayer(pName, ss.map);
+				Player pTemp = CreatePlayer(pName, ss.map, ss);
 				ss.currentPlayers.push_back(pTemp);				// store the player
 				Notice("Player: " + pName + " created.");
 
@@ -122,8 +122,11 @@ void Socket::HandleClientConnection(ServerSocket &ss, int index) {
 				std::string exitXY = std::to_string(ss.map.exitX) + "," + std::to_string(ss.map.exitY);
 				std::string playerCoord = std::to_string(pTemp.posX) + "," + std::to_string(pTemp.posY);
 				std::string mapSize = std::to_string(ss.map.mapW) + "," + std::to_string(ss.map.mapH);
-				std::string strMap = "map.info:" + mapSize + "," + exitXY + "," + playerCoord;
+				// std::string strMap = "map.info:" + mapSize + "," + exitXY + "," + playerCoord;
 
+				// new: with the player's id
+				// std::string strMap = "map.info:" + mapSize + "," + exitXY + "," + playerCoord + "," + std::to_string(ss.clientCount);
+				std::string strMap = "map.info:" + mapSize + "," + exitXY + "," + playerCoord + "," + std::to_string(pTemp.playerID);
 
 				Notice("Sending coordinates: " + strMap + " to client.");
 				int mapPosStrLength = strMap.length();
@@ -167,7 +170,7 @@ void Socket::HandleClientConnection(ServerSocket &ss, int index) {
 
 							exitXY = std::to_string(ss.map.exitX) + " " + std::to_string(ss.map.exitY);
 							playerCoord = std::to_string(p.posX) + " " + std::to_string(p.posY);
-							strMap = playerCoord + " " + exitXY;
+							strMap = std::string(name) + ".coord:" + playerCoord + " " + exitXY;
 						}
 					}
 
