@@ -137,7 +137,7 @@ void Socket::HandleClientConnection(ServerSocket &ss, int index) {
 				if (ss.clientsSocket.size() > 1) {
 					Notice("Updating clients about the new player.");
 
-					std::string updateClients = pName + ".coord:" + playerCoord;
+					std::string updateClients = pName + ".coord:" + playerCoord + "," + std::to_string(pTemp.playerID);
 					int iterator = 0;
 					for (int& client : ss.clientsSocket) {
 						if (iterator == index) continue;
@@ -168,9 +168,13 @@ void Socket::HandleClientConnection(ServerSocket &ss, int index) {
 							p.posX = x;
 							p.posY = y;
 
-							exitXY = std::to_string(ss.map.exitX) + " " + std::to_string(ss.map.exitY);
-							playerCoord = std::to_string(p.posX) + " " + std::to_string(p.posY);
-							strMap = std::string(name) + ".coord:" + playerCoord + " " + exitXY;
+							// exitXY = std::to_string(ss.map.exitX) + "," + std::to_string(ss.map.exitY);
+							// strMap = std::string(name) + ".coord:" + playerCoord + "," + exitXY;
+							playerCoord = std::to_string(p.posX) + "," + std::to_string(p.posY);
+							strMap = std::string(name) + ".coord:" + playerCoord;
+
+							Notice("Sending coordinates: " + strMap + " to client.");
+							Notice("Map sent to player: " + p.playerName);
 						}
 					}
 
@@ -180,15 +184,10 @@ void Socket::HandleClientConnection(ServerSocket &ss, int index) {
 					for (int& client : ss.clientsSocket) {
 						send(client, strMap.c_str(), mapPosStrLength, 0);
 					}
-
-
 				}
 			}
         }
 
-		// Notice("Sending coordinates: " + strMap + " to client.");
-		// Notice("Map sent.");
-		// Notice("Map sent to player: " + p.playerName);
 	}
 
 
